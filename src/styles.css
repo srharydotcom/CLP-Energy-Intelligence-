@@ -251,5 +251,4 @@
 }
 
 @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
-  .cursor-glow { display: none; }
 }
