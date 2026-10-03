@@ -1,32 +1,37 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { hkd, num, type ProductEconomics } from "@/lib/energy";
+import { hkd, num, type ContextEconomics } from "@/lib/energy";
+
+const FIT_LABEL = { fits: "Right size", undersized: "Too small", oversized: "Oversized", "n/a": "—" } as const;
 
 export function ProductComparisonTable({
   rows,
   selectedId,
   baselineId,
+  bestId,
+  horizon,
   onSelect,
 }: {
-  rows: ProductEconomics[];
+  rows: ContextEconomics[];
   selectedId?: string;
   baselineId?: string;
+  bestId?: string;
+  horizon: number;
   onSelect?: (id: string) => void;
 }) {
-  const best = rows.reduce<ProductEconomics | undefined>((b, r) => (!b || r.costPerYear < b.costPerYear ? r : b), undefined);
   return (
-    <div className="rounded-lg border bg-card">
+    <div className="overflow-x-auto rounded-lg border bg-card">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Model</TableHead>
-            <TableHead className="text-right">Label</TableHead>
+            <TableHead>Fit for home</TableHead>
             <TableHead className="text-right">Price</TableHead>
-            <TableHead className="text-right">kWh/yr</TableHead>
+            <TableHead className="text-right">kWh/yr (yours)</TableHead>
             <TableHead className="text-right">Energy/yr</TableHead>
-            <TableHead className="text-right">Lifetime (PV)</TableHead>
-            <TableHead className="text-right">Cost/yr owned</TableHead>
+            <TableHead className="text-right">Life</TableHead>
+            <TableHead className="text-right">{horizon}-yr cost to own</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -38,17 +43,28 @@ export function ProductComparisonTable({
             >
               <TableCell>
                 <div className="font-medium">{r.product.brand} {r.product.model}</div>
-                <div className="mt-0.5 flex gap-1.5">
-                  {r === best && <Badge className="bg-positive text-background hover:bg-positive">Lowest cost to own</Badge>}
-                  {baselineId === r.product.id && <Badge variant="outline">Baseline</Badge>}
+                <div className="mt-0.5 flex flex-wrap gap-1.5">
+                  {bestId === r.product.id && <Badge className="bg-positive text-background hover:bg-positive">Best choice</Badge>}
+                  {baselineId === r.product.id && <Badge variant="outline">Cheapest to buy</Badge>}
+                  {r.product.id.startsWith("custom-") && <Badge variant="secondary">Your product</Badge>}
                 </div>
               </TableCell>
-              <TableCell className="text-right font-mono">G{r.product.energy_label}</TableCell>
+              <TableCell>
+                <span className={cn("text-sm", r.fit === "fits" && "text-positive", r.fit === "undersized" && "text-warning")}>
+                  {FIT_LABEL[r.fit]}
+                </span>
+                {r.product.capacity != null && (
+                  <div className="font-mono text-[11px] text-muted-foreground">
+                    {num(Number(r.product.capacity), 1)} {r.product.capacity_unit}
+                    {r.required != null && <> · need {num(r.required, 1)}</>}
+                  </div>
+                )}
+              </TableCell>
               <TableCell className="text-right tabular-nums">{hkd(Number(r.product.price))}</TableCell>
-              <TableCell className="text-right tabular-nums">{num(Number(r.product.annual_kwh))}</TableCell>
+              <TableCell className="text-right tabular-nums">{num(r.annualKwh)}</TableCell>
               <TableCell className="text-right tabular-nums">{hkd(r.annualCost)}</TableCell>
-              <TableCell className="text-right tabular-nums">{hkd(r.lifetimeCost)}</TableCell>
-              <TableCell className="text-right font-semibold tabular-nums">{hkd(r.costPerYear)}</TableCell>
+              <TableCell className="text-right tabular-nums">{r.product.lifetime_years} yrs</TableCell>
+              <TableCell className="text-right font-semibold tabular-nums">{hkd(r.horizonTco)}</TableCell>
             </TableRow>
           ))}
         </TableBody>

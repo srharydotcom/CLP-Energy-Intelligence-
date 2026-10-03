@@ -155,6 +155,8 @@ export type Database = {
         Row: {
           annual_kwh: number
           brand: string
+          capacity: number | null
+          capacity_unit: string | null
           category: string
           energy_label: number
           id: string
@@ -162,10 +164,16 @@ export type Database = {
           maintenance_per_year: number
           model: string
           price: number
+          reference_value: number
+          shift_kwh: number
+          usage_basis: string
+          usage_elasticity: number
         }
         Insert: {
           annual_kwh: number
           brand: string
+          capacity?: number | null
+          capacity_unit?: string | null
           category: string
           energy_label: number
           id: string
@@ -173,10 +181,16 @@ export type Database = {
           maintenance_per_year?: number
           model: string
           price: number
+          reference_value?: number
+          shift_kwh?: number
+          usage_basis?: string
+          usage_elasticity?: number
         }
         Update: {
           annual_kwh?: number
           brand?: string
+          capacity?: number | null
+          capacity_unit?: string | null
           category?: string
           energy_label?: number
           id?: string
@@ -184,6 +198,10 @@ export type Database = {
           maintenance_per_year?: number
           model?: string
           price?: number
+          reference_value?: number
+          shift_kwh?: number
+          usage_basis?: string
+          usage_elasticity?: number
         }
         Relationships: []
       }

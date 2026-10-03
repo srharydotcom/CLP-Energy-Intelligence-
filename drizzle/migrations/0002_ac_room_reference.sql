@@ -1,0 +1,1 @@
+UPDATE public.products SET reference_value = 20 WHERE category = 'Air conditioner';
