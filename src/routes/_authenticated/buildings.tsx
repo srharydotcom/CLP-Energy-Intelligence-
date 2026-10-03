@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Plus, Trash2, CheckCircle2, XCircle } from "lucide-react";
 import { PageHeader } from "@/components/energy/AppShell";
 import { AssumptionPanel } from "@/components/energy/AssumptionPanel";
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/buildings")({
   component: BuildingsPage,
 });
 
-function F({ label, value, onChange, step = 1, suffix, placeholder }: { label: string; value: number | null; onChange: (n: number | null) => void; step?: number; suffix?: string; placeholder?: string }) {
+function F({ label, value, onChange, step = 1, suffix, placeholder }: { label: string; value: number | null; onChange: (n: number | null) => void; step?: number | undefined; suffix?: string | undefined; placeholder?: string }) {
   return (
     <div className="space-y-1">
       <Label className="text-xs text-muted-foreground">{label}{suffix && <span className="ml-1 font-mono">({suffix})</span>}</Label>
@@ -38,23 +38,77 @@ function F({ label, value, onChange, step = 1, suffix, placeholder }: { label: s
     </div>
   );
 }
+type BasicKey = "areaM2" | "hoursPerDay" | "daysPerWeek" | "occupancy" | "rate" | "budget";
+const BASICS: { key: BasicKey; label: string; suffix?: string; step?: number }[] = [
+  { key: "areaM2", label: "Floor area", suffix: "m²", step: 100 },
+  { key: "hoursPerDay", label: "Operating hours/day", step: 0.5 },
+  { key: "daysPerWeek", label: "Days open per week" },
+  { key: "occupancy", label: "Typical occupancy", suffix: "people", step: 10 },
+  { key: "rate", label: "Electricity price, all-in", suffix: "HK$/kWh", step: 0.01 },
+  { key: "budget", label: "Capital budget", suffix: "HK$", step: 100000 },
+];
+const EMPTY_BASICS: Record<BasicKey, number | null> = { areaM2: null, hoursPerDay: null, daysPerWeek: null, occupancy: null, rate: null, budget: null };
 const req = (fn: (n: number) => void) => (n: number | null) => fn(n ?? 0);
 
 function BuildingsPage() {
   const archetypes = useQuery(archetypesQuery);
   const measures = useQuery(measuresQuery);
-  const [archId, setArchId] = useState("mall");
+  const [archId, setArchIdRaw] = useState("");
+  const [basics, setBasics] = useState<Record<BasicKey, number | null>>(EMPTY_BASICS);
   const [x, setX] = useState<BuildingInputs | null>(null);
   const [a, setA] = useState({ ...DEFAULT_ASSUMPTIONS, horizonYears: 15 });
   const arch = archetypes.data?.find((r) => r.id === archId);
 
-  useEffect(() => { if (arch) setX(defaultInputs(arch)); }, [arch]);
+  const setArchId = (id: string) => { setArchIdRaw(id); setX(null); setBasics(EMPTY_BASICS); };
+  const basicsReady = BASICS.every((f) => (basics[f.key] ?? 0) > 0);
+  const start = () => {
+    if (!arch || !basicsReady) return;
+    const area = basics.areaM2!;
+    setX({ ...defaultInputs({ ...arch, default_area_m2: area }), ...(basics as Record<BasicKey, number>), hoursPerDay: Math.min(24, basics.hoursPerDay!), daysPerWeek: Math.min(7, basics.daysPerWeek!) });
+  };
   const set = (patch: Partial<BuildingInputs>) => setX((v) => (v ? { ...v, ...patch } : v));
 
   const res = useMemo(() => (arch && x && measures.data ? evaluateMeasures(arch, measures.data, x, a) : null), [arch, x, measures.data, a]);
   const sens = useMemo(() => (arch && x && measures.data ? sensitivity(arch, measures.data, x, a) : null), [arch, x, measures.data, a]);
 
-  if (!archetypes.data || !measures.data || !x || !res || !sens || !arch) return <Skeleton className="h-96" />;
+  if (!archetypes.data || !measures.data) return <Skeleton className="h-96" />;
+  const intro = <PageHeader kicker="Module 05" title="Building Energy Investments" sub="Tell us about your building first — we only show investment results for the building you describe." />;
+  if (!arch) return (
+    <div className="space-y-6">{intro}
+      <section className="rounded-lg border bg-card p-6">
+        <div className="mb-1 font-display text-lg font-semibold">What kind of building is it?</div>
+        <p className="mb-4 text-sm text-muted-foreground">This sets how energy is typically split between cooling, lighting, hot water and so on.</p>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {archetypes.data.map((r) => <Button key={r.id} variant="outline" className="h-12 justify-start" onClick={() => setArchId(r.id)}>{r.name}</Button>)}
+        </div>
+      </section>
+    </div>
+  );
+  if (!x || !res || !sens) {
+    const area = basics.areaM2 ?? Number(arch.default_area_m2);
+    const typical: Record<BasicKey, string> = {
+      areaM2: num(Number(arch.default_area_m2)), hoursPerDay: num(Number(arch.hours_per_day)), daysPerWeek: num(Number(arch.days_per_week)),
+      occupancy: num(Math.round((Number(arch.occupancy_per_1000m2) * area) / 1000)), rate: "1.10", budget: "—",
+    };
+    return (
+      <div className="space-y-6">{intro}
+        <section className="rounded-lg border bg-card p-6">
+          <div className="mb-1 flex items-center justify-between gap-3">
+            <div className="font-display text-lg font-semibold">About your {arch.name.toLowerCase()}</div>
+            <Button variant="ghost" size="sm" onClick={() => setArchId("")}>Change building type</Button>
+          </div>
+          <p className="mb-4 text-sm text-muted-foreground">Enter your own figures. Grey hints show what is typical for this type of building.</p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {BASICS.map((f) => (
+              <F key={f.key} label={f.label} suffix={f.suffix} step={f.step} placeholder={`typical ${typical[f.key]}`} value={basics[f.key]} onChange={(n) => setBasics({ ...basics, [f.key]: n })} />
+            ))}
+          </div>
+          <Button className="mt-5" disabled={!basicsReady} onClick={start}>Evaluate investments</Button>
+          {!basicsReady && <span className="ml-3 text-xs text-muted-foreground">Fill in every field first.</span>}
+        </section>
+      </div>
+    );
+  }
   const b = res.baseline;
   const pf = res.portfolio;
   const sMin = Math.min(...sens.rows.map((r) => r.low), sens.baseNpv);

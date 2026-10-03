@@ -10,8 +10,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { optionsQuery, sitesQuery } from "@/lib/queries";
-import { DEFAULT_ASSUMPTIONS, asArray, hkd, num, procurementResult } from "@/lib/energy";
+import { optionsQuery } from "@/lib/queries";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { DEFAULT_ASSUMPTIONS, asArray, hkd, num, procurementResult, type Site } from "@/lib/energy";
 
 export const Route = createFileRoute("/_authenticated/procurement")({
   head: () => ({
@@ -26,11 +29,15 @@ export const Route = createFileRoute("/_authenticated/procurement")({
 });
 
 function ProcurementPage() {
-  const sites = useQuery(sitesQuery);
   const options = useQuery(optionsQuery);
-  const [siteId, setSiteId] = useState("site-1");
   const [a, setA] = useState({ ...DEFAULT_ASSUMPTIONS, loadShiftPct: 15 });
-  const site = sites.data?.find((s) => s.id === siteId);
+  const [f, setF] = useState<{ name: string; sector: string; annualMwh: number | null; peakKw: number | null; peakPct: number | null; currentId: string }>({ name: "", sector: "", annualMwh: null, peakKw: null, peakPct: null, currentId: "" });
+  const [site, setSite] = useState<Site | null>(null);
+  const ready = !!f.sector && (f.annualMwh ?? 0) > 0 && (f.peakKw ?? 0) > 0 && f.peakPct != null && f.peakPct <= 100 && !!f.currentId;
+  const submit = () => {
+    if (!ready) return;
+    setSite({ id: "my-site", name: f.name || "My site", sector: f.sector, peak_kw: f.peakKw!, peak_share: f.peakPct! / 100, monthly_mwh: Array(12).fill(f.annualMwh! / 12), current_option_id: f.currentId });
+  };
 
   const results = useMemo(() => (site ? (options.data ?? []).map((o) => procurementResult(site, o, a)) : []), [site, options.data, a]);
   const current = results.find((r) => r.option.id === site?.current_option_id);
@@ -42,20 +49,43 @@ function ProcurementPage() {
       kicker="Module 03"
       title="Business Energy Procurement"
       sub="Evaluate supply structures for a site on expected cost, price-risk band and emissions."
-      right={
-        <Select value={siteId} onValueChange={setSiteId}>
-          <SelectTrigger className="w-64"><SelectValue /></SelectTrigger>
-          <SelectContent>{sites.data?.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
-        </Select>
-      }
     />
   );
-  if (!site || !current || !best) return <>{header}<Skeleton className="h-96" /></>;
+  const num0 = (v: string) => (v === "" ? null : Math.max(0, Number(v)));
+  const form = (
+    <section className="mb-5 rounded-lg border bg-card p-5">
+      <div className="mb-1 font-display text-lg font-semibold">Your site</div>
+      <p className="mb-4 text-sm text-muted-foreground">Take these from your last 12 months of bills. Nothing is shown until you enter them.</p>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div><Label className="text-xs text-muted-foreground">Site name (optional)</Label><Input className="mt-1" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></div>
+        <div><Label className="text-xs text-muted-foreground">Business type</Label>
+          <Select value={f.sector} onValueChange={(v) => setF({ ...f, sector: v })}>
+            <SelectTrigger className="mt-1"><SelectValue placeholder="Choose" /></SelectTrigger>
+            <SelectContent>{["Retail", "Hotel", "Office", "Industrial", "Data centre", "Education", "Healthcare", "Food & beverage", "Other"].map((x) => <SelectItem key={x} value={x}>{x}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
+        <div><Label className="text-xs text-muted-foreground">Current supply plan</Label>
+          <Select value={f.currentId} onValueChange={(v) => setF({ ...f, currentId: v })}>
+            <SelectTrigger className="mt-1"><SelectValue placeholder="Choose" /></SelectTrigger>
+            <SelectContent>{options.data?.map((o) => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
+        <div><Label className="text-xs text-muted-foreground">Electricity used per year (MWh)</Label><Input type="number" min={0} className="mt-1" value={f.annualMwh ?? ""} onChange={(e) => setF({ ...f, annualMwh: num0(e.target.value) })} /></div>
+        <div><Label className="text-xs text-muted-foreground">Highest demand (kW)</Label><Input type="number" min={0} className="mt-1" value={f.peakKw ?? ""} onChange={(e) => setF({ ...f, peakKw: num0(e.target.value) })} /></div>
+        <div><Label className="text-xs text-muted-foreground">Share used in peak hours (%)</Label><Input type="number" min={0} max={100} className="mt-1" value={f.peakPct ?? ""} onChange={(e) => setF({ ...f, peakPct: num0(e.target.value) })} /></div>
+      </div>
+      <Button className="mt-5" disabled={!ready} onClick={submit}>{site ? "Update comparison" : "Compare supply options"}</Button>
+      {!ready && <span className="ml-3 text-xs text-muted-foreground">Fill in every required field first.</span>}
+    </section>
+  );
+  if (options.isLoading) return <>{header}<Skeleton className="h-96" /></>;
+  if (!site || !current || !best) return <>{header}{form}</>;
   const annualMwh = asArray(site.monthly_mwh).reduce((s, x) => s + x, 0);
 
   return (
     <>
       {header}
+      {form}
       <div className="grid gap-5 lg:grid-cols-[1fr_300px]">
         <div className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-3">
