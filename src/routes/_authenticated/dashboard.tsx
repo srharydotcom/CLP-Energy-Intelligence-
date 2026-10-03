@@ -65,12 +65,6 @@ function HouseholdDashboard({ name }: { name: string | null }) {
               ))}
             </div>
           </div>
-          <div aria-hidden className="relative hidden min-h-40 overflow-hidden rounded-2xl border bg-card md:col-span-1 md:row-span-2 md:block lg:col-span-2">
-            <div className="ambient pointer-events-none absolute inset-0 z-0 opacity-90" />
-            <div className="pointer-events-none absolute -right-10 -top-10 z-0 size-56 animate-pulse rounded-full bg-primary/15 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-12 left-6 z-0 size-48 rounded-full bg-chart-2/20 blur-3xl" />
-            <div className="absolute bottom-4 left-5 z-[1] font-mono text-[10px] uppercase tracking-widest text-muted-foreground">CLP · Energy Intelligence</div>
-          </div>
           <Tile label="Homes saved" value={String(homes.length)} />
           <Tile label="Appliances tracked" value={String(homes.reduce((s, h) => s + h.appliances.length, 0))} />
         </div>
