@@ -34,7 +34,7 @@ export const Route = createFileRoute("/buy")({
 });
 
 const USAGE_BASIS: Record<string, { basis: string; ref: number; elasticity: number; unit: string | null }> = {
-  "Air conditioner": { basis: "area", ref: 40, elasticity: 1, unit: "kW" },
+  "Air conditioner": { basis: "area", ref: 20, elasticity: 1, unit: "kW" },
   Refrigerator: { basis: "occupants", ref: 3, elasticity: 0.3, unit: "L" },
   "Water heater": { basis: "occupants", ref: 3, elasticity: 1, unit: "L" },
   EV: { basis: "km", ref: 12000, elasticity: 1, unit: "kWh" },
@@ -96,7 +96,7 @@ function BuyPage() {
   const [a, setA] = useState(DEFAULT_ASSUMPTIONS);
   const [homeId, setHomeId] = useState("home-1");
   const [tariffId, setTariffId] = useState<string>();
-  const [ctx, setCtx] = useState<HouseholdContext>({ areaM2: 68, occupants: 3, acHoursPerDay: 8, evKmPerYear: 12000 });
+  const [ctx, setCtx] = useState<HouseholdContext>({ areaM2: 68, roomM2: 18, occupants: 3, acHoursPerDay: 8, evKmPerYear: 12000 });
 
   const home = homes.data?.find((h) => h.id === homeId);
   useEffect(() => {
@@ -147,7 +147,11 @@ function BuyPage() {
             <SelectContent>{tariffs.data?.filter((t) => t.segment === "residential").map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
-        <NumField label={category === "Air conditioner" ? "Area to cool (m²)" : "Home area (m²)"} value={ctx.areaM2} onChange={(n) => setCtx({ ...ctx, areaM2: n })} />
+        {category === "Air conditioner" ? (
+          <NumField label="Room to cool (m²)" value={ctx.roomM2} onChange={(n) => setCtx({ ...ctx, roomM2: n })} hint={`Home: ${num(ctx.areaM2)} m²`} />
+        ) : (
+          <NumField label="Home area (m²)" value={ctx.areaM2} onChange={(n) => setCtx({ ...ctx, areaM2: n })} />
+        )}
         <NumField label="People at home" value={ctx.occupants} onChange={(n) => setCtx({ ...ctx, occupants: n })} />
         {category === "EV" ? (
           <NumField label="Driving (km/yr)" value={ctx.evKmPerYear} step={500} onChange={(n) => setCtx({ ...ctx, evKmPerYear: n })} />
@@ -172,7 +176,8 @@ function BuyPage() {
               {best.product.id === baseline.product.id
                 ? "It is also the cheapest suitable model to buy."
                 : <>Costs {hkd(Number(best.product.price) - Number(baseline.product.price))} more upfront than the {baseline.product.brand} {baseline.product.model}, but {hkd(baseline.horizonTco - best.horizonTco)} less over {H} years.</>}
-              {rows.some((r) => r.fit === "undersized") && " Models too small for your space are excluded."}
+              {usable.length > 0 && usable.length < rows.length && " Models too small for your space are excluded."}
+              {usable.length === 0 && " Every model here is too small for your space — consider a larger unit or two units."}
             </div>
           </div>
 
@@ -215,7 +220,7 @@ function BuyPage() {
           <div className="rounded-lg border bg-card p-4 text-xs text-muted-foreground space-y-1.5">
             <div className="font-mono text-[11px] uppercase tracking-widest">How we estimate</div>
             <p>Rated kWh is scaled to your home: AC by area cooled and hours of use, fridges and water heaters by people, EVs by distance.</p>
-            <p>Sizing: AC ≈ 0.2 kW per m²; fridge ≈ 120 L + 80 L per person; storage heater ≈ 30 L per person. Undersized ACs use 25% more energy.</p>
+            <p>Sizing: AC ≈ 0.18 kW per m² of room; fridge ≈ 120 L + 80 L per person; storage heater ≈ 30 L per person. Undersized ACs use 25% more energy.</p>
             <p>Cost to own = purchase (with replacements inside the horizon) + energy + upkeep, discounted to today. Break-even uses cumulative spend.</p>
             <p>Electricity: {hkd(effectiveRate(tariff, a), 2)}/kWh on {tariff.name}.</p>
           </div>

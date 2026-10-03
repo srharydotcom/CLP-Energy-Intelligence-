@@ -161,7 +161,8 @@ export const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "
 
 // ---------- Household-context purchase economics ----------
 export interface HouseholdContext {
-  areaM2: number; // area the product serves (for area-driven products)
+  areaM2: number; // whole-home floor area
+  roomM2: number; // area a room AC must cool
   occupants: number;
   acHoursPerDay: number;
   evKmPerYear: number;
@@ -172,7 +173,7 @@ export type SizeFit = "fits" | "undersized" | "oversized" | "n/a";
 
 /** Capacity the household needs, in the product's capacity unit. */
 export function requiredCapacity(p: Product, ctx: HouseholdContext): number | null {
-  if (p.category === "Air conditioner") return ctx.areaM2 * 0.2; // ~200 W cooling per m² (HK climate)
+  if (p.category === "Air conditioner") return ctx.roomM2 * 0.18; // ~180 W cooling per m² (HK climate)
   if (p.category === "Refrigerator") return 120 + 80 * ctx.occupants; // litres
   if (p.category === "Water heater" && p.capacity != null) return 30 * ctx.occupants; // storage litres
   return null;
@@ -190,7 +191,7 @@ export function usageFactor(p: Product, ctx: HouseholdContext): number {
   const ref = Number(p.reference_value) || 1;
   const e = Number(p.usage_elasticity);
   let ratio = 1;
-  if (p.usage_basis === "area") ratio = (ctx.areaM2 / ref) * (p.category === "Air conditioner" ? ctx.acHoursPerDay / AC_REF_HOURS : 1);
+  if (p.usage_basis === "area") ratio = p.category === "Air conditioner" ? (ctx.roomM2 / ref) * (ctx.acHoursPerDay / AC_REF_HOURS) : ctx.areaM2 / ref;
   else if (p.usage_basis === "occupants") ratio = ctx.occupants / ref;
   else if (p.usage_basis === "km") ratio = ctx.evKmPerYear / ref;
   let f = Math.max(0.1, 1 + e * (ratio - 1));
