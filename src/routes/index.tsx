@@ -17,6 +17,8 @@ export const Route = createFileRoute("/")({
   component: Overview,
 });
 
+const GRADE_BG: Record<string, string> = { A: "bg-grade-a", B: "bg-grade-b", C: "bg-grade-c", D: "bg-grade-d", E: "bg-grade-e" };
+
 function Overview() {
   const homes = useQuery(homesQuery);
   const tariffs = useQuery(tariffsQuery);
@@ -72,7 +74,7 @@ function Overview() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="tabular-nums">{hkd(m.annualCost)}</span>
-                  <span className={`grid size-7 place-items-center rounded font-mono text-sm font-bold text-background bg-grade-${m.grade.toLowerCase()}`}>{m.grade}</span>
+                  <span className={`grid size-7 place-items-center rounded font-mono text-sm font-bold text-background ${GRADE_BG[m.grade]}`}>{m.grade}</span>
                 </div>
               </div>
             ))}
