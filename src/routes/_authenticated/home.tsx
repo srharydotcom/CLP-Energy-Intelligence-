@@ -152,7 +152,7 @@ function HomeEditor({ home, update }: { home: SavedHome; update: (fn: (h: SavedH
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Choice label="Floor" value={p.floorLevel} onChange={(v) => setProfile({ floorLevel: v })} options={[["low", "Low (1–5)"], ["mid", "Middle"], ["high", "High / top floor"]]} />
               <Choice label="Building age" value={p.buildingAge} onChange={(v) => setProfile({ buildingAge: v })} options={[["new", "Under 10 years"], ["10-30", "10–30 years"], ["30+", "Over 30 years"]]} />
-              <div className="flex items-center justify-between rounded-md border px-3 py-2"><Label className="text-sm">Main windows face west</Label><Switch checked={p.westFacing} onCheckedChange={(v) => setProfile({ westFacing: v })} /></div>
+              <Choice label="Main windows face (affects how hard your AC works)" value={p.windowFacing ?? "unknown"} onChange={(v) => setProfile({ windowFacing: v })} options={[["N", "North"], ["NE", "North-east"], ["E", "East"], ["SE", "South-east"], ["S", "South"], ["SW", "South-west"], ["W", "West"], ["NW", "North-west"], ["unknown", "Not sure"]]} />
               <Choice label="Electricity plan" value={tariff.id} onChange={(v) => setProfile({ tariffId: v })} options={residential.map((t) => [t.id, t.name] as [string, string])} />
             </div>
           </div>

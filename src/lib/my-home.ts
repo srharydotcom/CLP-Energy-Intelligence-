@@ -15,7 +15,7 @@ export interface MyHomeProfile {
   evKmPerYear: number;
   // richer context
   floorLevel: "low" | "mid" | "high";
-  westFacing: boolean;
+  windowFacing: "N" | "NE" | "E" | "SE" | "S" | "SW" | "W" | "NW" | "unknown";
   buildingAge: "new" | "10-30" | "30+";
   waterHeating: "electric" | "gas" | "unknown";
   cooking: "electric" | "gas";
@@ -25,8 +25,8 @@ export interface MyHomeProfile {
 export interface SavedHome { id: string; profile: MyHomeProfile; appliances: OwnedAppliance[]; updatedAt: string }
 
 export const DEFAULT_PROFILE: MyHomeProfile = {
-  name: "My home", district: "", propertyType: "flat", areaM2: 55, occupants: 3, bedrooms: 2, tariffId: "res-std",
-  acHoursPerDay: 8, evKmPerYear: 0, floorLevel: "mid", westFacing: false, buildingAge: "10-30",
+  name: "My home", district: "", propertyType: "flat", areaM2: 0, occupants: 0, bedrooms: 0, tariffId: "res-std",
+  acHoursPerDay: 8, evKmPerYear: 0, floorLevel: "mid", windowFacing: "unknown", buildingAge: "10-30",
   waterHeating: "electric", cooking: "gas", homeDuringDay: false,
 };
 
@@ -101,7 +101,19 @@ export const END_USE_LABEL: Record<string, string> = {
 };
 
 
+/** Afternoon sun on west/south-west glass, top floors and old buildings all add cooling load (HK rule-of-thumb, demo figures). */
+export const WINDOW_SUN_FACTOR: Record<MyHomeProfile["windowFacing"], number> = {
+  N: 0.92, NE: 0.97, E: 1.03, SE: 1.05, S: 1.04, SW: 1.12, W: 1.15, NW: 1.06, unknown: 1,
+};
+export function coolingFactor(p: MyHomeProfile): number {
+  return (WINDOW_SUN_FACTOR[p.windowFacing] ?? 1) * (p.floorLevel === "high" ? 1.06 : 1) * (p.buildingAge === "30+" ? 1.05 : 1);
+}
+/** A home is ready for advice once its size, household and current appliances are known. */
+export function homeIsComplete(h: SavedHome | null | undefined): boolean {
+  return !!h && h.profile.areaM2 > 0 && h.profile.occupants > 0 && h.appliances.length > 0;
+}
+
 export function homeContext(p: MyHomeProfile): HouseholdContext {
-  return { areaM2: p.areaM2, roomM2: Math.max(10, Math.round(p.areaM2 / (p.bedrooms + 1))), occupants: p.occupants, acHoursPerDay: p.acHoursPerDay, evKmPerYear: p.evKmPerYear };
+  return { coolingFactor: coolingFactor(p), areaM2: p.areaM2, roomM2: Math.max(10, Math.round(p.areaM2 / (p.bedrooms + 1))), occupants: p.occupants, acHoursPerDay: p.acHoursPerDay, evKmPerYear: p.evKmPerYear };
 }
 

@@ -166,6 +166,7 @@ export interface HouseholdContext {
   occupants: number;
   acHoursPerDay: number;
   evKmPerYear: number;
+  coolingFactor?: number; // sun exposure / floor / building age multiplier on AC use
 }
 export const AC_REF_HOURS = 8;
 
@@ -197,6 +198,7 @@ export function usageFactor(p: Product, ctx: HouseholdContext): number {
   let f = Math.max(0.1, 1 + e * (ratio - 1));
   // An undersized AC runs flat-out and loses efficiency; oversized short-cycles.
   const fit = sizeFit(p, ctx);
+  if (p.category === "Air conditioner") f *= ctx.coolingFactor ?? 1;
   if (p.category === "Air conditioner") f *= fit === "undersized" ? 1.25 : fit === "oversized" ? 1.08 : 1;
   return f;
 }
