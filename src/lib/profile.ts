@@ -15,7 +15,7 @@ export function useProfile() {
       const { data } = await supabase.from("profiles").select("id,display_name,user_type,tour_done").eq("id", u.user.id).maybeSingle();
       if (data) return { ...(data as Omit<Profile, "email">), email: u.user.email ?? null };
       // Profile row missing (e.g. account created before profiles existed) — create it.
-      const fresh = { id: u.user.id, display_name: (u.user.user_metadata?.full_name as string) ?? u.user.email?.split("@")[0] ?? null, user_type: "household" as const, tour_done: false };
+      const fresh = { id: u.user.id, display_name: (u.user.user_metadata?.['full_name'] as string) ?? u.user.email?.split("@")[0] ?? null, user_type: "household" as const, tour_done: false };
       await supabase.from("profiles").insert(fresh);
       return { ...fresh, email: u.user.email ?? null };
     },
