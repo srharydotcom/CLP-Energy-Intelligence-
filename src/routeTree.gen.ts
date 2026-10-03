@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BuildingsRouteImport } from './routes/buildings'
 import { Route as BuyRouteImport } from './routes/buy'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as PassportRouteImport } from './routes/passport'
@@ -19,6 +20,11 @@ import { Route as ScenariosRouteImport } from './routes/scenarios'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BuildingsRoute = BuildingsRouteImport.update({
+  id: '/buildings',
+  path: '/buildings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BuyRoute = BuyRouteImport.update({
@@ -49,6 +55,7 @@ const ScenariosRoute = ScenariosRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/buildings': typeof BuildingsRoute
   '/buy': typeof BuyRoute
   '/home': typeof HomeRoute
   '/passport': typeof PassportRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/buildings': typeof BuildingsRoute
   '/buy': typeof BuyRoute
   '/home': typeof HomeRoute
   '/passport': typeof PassportRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/buildings': typeof BuildingsRoute
   '/buy': typeof BuyRoute
   '/home': typeof HomeRoute
   '/passport': typeof PassportRoute
@@ -75,12 +84,26 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/buy' | '/home' | '/passport' | '/procurement' | '/scenarios'
+    | '/'
+    | '/buildings'
+    | '/buy'
+    | '/home'
+    | '/passport'
+    | '/procurement'
+    | '/scenarios'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/buy' | '/home' | '/passport' | '/procurement' | '/scenarios'
+  to:
+    | '/'
+    | '/buildings'
+    | '/buy'
+    | '/home'
+    | '/passport'
+    | '/procurement'
+    | '/scenarios'
   id:
     | '__root__'
     | '/'
+    | '/buildings'
     | '/buy'
     | '/home'
     | '/passport'
@@ -90,6 +113,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BuildingsRoute: typeof BuildingsRoute
   BuyRoute: typeof BuyRoute
   HomeRoute: typeof HomeRoute
   PassportRoute: typeof PassportRoute
@@ -104,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/buildings': {
+      id: '/buildings'
+      path: '/buildings'
+      fullPath: '/buildings'
+      preLoaderRoute: typeof BuildingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/buy': {
@@ -146,6 +177,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BuildingsRoute: BuildingsRoute,
   BuyRoute: BuyRoute,
   HomeRoute: HomeRoute,
   PassportRoute: PassportRoute,
