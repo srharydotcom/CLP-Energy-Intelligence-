@@ -99,7 +99,7 @@ function ScenariosPage() {
           <ScenarioPanel title="Annual cost by scenario" rows={rows} />
           <AIAnalysisPanel
             module="scenario"
-            subjectId={id}
+            subjectId={id ?? ""}
             metrics={{ subject: subjectLabel, kind, baseline_annual_cost: Math.round(baseline), scenarios: rows.map((r) => ({ name: r.name, annual_cost: Math.round(r.value), delta: Math.round(r.value - baseline) })), custom_assumptions: a, horizon_pv: Math.round(horizonPv) }}
           />
         </div>

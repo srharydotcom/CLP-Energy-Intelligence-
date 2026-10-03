@@ -37,7 +37,7 @@ export const runAnalysis = createServerFn({ method: "POST" })
         model: provider.responses("openai/gpt-6-astra"),
         system: SYSTEM,
         prompt: `Module: ${data.module}\nSubject: ${data.subjectId}\nInput metrics:\n${JSON.stringify(data.metrics, null, 2)}`,
-        experimental_output: Output.object({ schema: analysisSchema }),
+        output: Output.object({ schema: analysisSchema }),
         providerOptions: {
           openai: {
             forceReasoning: true,
@@ -52,7 +52,7 @@ export const runAnalysis = createServerFn({ method: "POST" })
       try {
         // drain stream, then read typed output
         await result.text;
-        analysis = analysisSchema.parse(await result.experimental_output);
+        analysis = analysisSchema.parse(await result.output);
       } catch (e) {
         if (NoObjectGeneratedError.isInstance(e)) return { ok: false, error: "The analysis came back incomplete. Try again." };
         throw e;

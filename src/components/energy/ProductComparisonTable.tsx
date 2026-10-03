@@ -14,7 +14,7 @@ export function ProductComparisonTable({
   baselineId?: string;
   onSelect?: (id: string) => void;
 }) {
-  const best = rows.reduce((b, r) => (r.costPerYear < b.costPerYear ? r : b), rows[0]);
+  const best = rows.reduce<ProductEconomics | undefined>((b, r) => (!b || r.costPerYear < b.costPerYear ? r : b), undefined);
   return (
     <div className="rounded-lg border bg-card">
       <Table>

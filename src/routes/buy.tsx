@@ -37,8 +37,8 @@ function BuyPage() {
     [products.data, tariff, category, a],
   );
   // Baseline = cheapest sticker price in category
-  const baseline = rows.reduce((b, r) => (b && Number(b.product.price) <= Number(r.product.price) ? b : r), rows[0]);
-  const cand = rows.find((r) => r.product.id === selected) ?? rows.reduce((b, r) => (r.costPerYear < b.costPerYear ? r : b), rows[0]);
+  const baseline = rows.reduce<(typeof rows)[number] | undefined>((b, r) => (b && Number(b.product.price) <= Number(r.product.price) ? b : r), undefined);
+  const cand = rows.find((r) => r.product.id === selected) ?? rows.reduce<(typeof rows)[number] | undefined>((b, r) => (!b || r.costPerYear < b.costPerYear ? r : b), undefined);
 
   const header = <PageHeader kicker="Module 02" title="Should I Buy This?" sub="Compare products on total cost of ownership, not sticker price. Select a model to see its case against the cheapest option." />;
   if (!tariff || !cand || !baseline) return <>{header}<Skeleton className="h-96" /></>;

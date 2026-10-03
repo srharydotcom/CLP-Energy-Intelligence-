@@ -34,7 +34,7 @@ function ProcurementPage() {
 
   const results = useMemo(() => (site ? (options.data ?? []).map((o) => procurementResult(site, o, a)) : []), [site, options.data, a]);
   const current = results.find((r) => r.option.id === site?.current_option_id);
-  const best = results.reduce((b, r) => (r.annualCost < b.annualCost ? r : b), results[0]);
+  const best = results.reduce<(typeof results)[number] | undefined>((b, r) => (!b || r.annualCost < b.annualCost ? r : b), undefined);
   const maxHigh = Math.max(...results.map((r) => r.highCost), 1);
 
   const header = (
