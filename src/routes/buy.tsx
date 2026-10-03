@@ -118,7 +118,7 @@ function BuyPage() {
   const usable = rows.filter((r) => r.fit !== "undersized");
   const pool = usable.length ? usable : rows;
   const best = pool.reduce<(typeof rows)[number] | undefined>((b, r) => (!b || r.horizonTco < b.horizonTco ? r : b), undefined);
-  const baseline = pool.reduce<(typeof rows)[number] | undefined>((b, r) => (b && Number(b.product.price) <= Number(r.product.price) ? b : r), undefined);
+  const baseline = rows.reduce<(typeof rows)[number] | undefined>((b, r) => (b && Number(b.product.price) <= Number(r.product.price) ? b : r), undefined);
   const cand = rows.find((r) => r.product.id === selected) ?? best;
 
   const header = <PageHeader kicker="Module 02" title="Should I Buy This?" sub="Cost a product in your own home — its size, your household and your tariff — and compare its total cost of ownership with the alternatives." />;
