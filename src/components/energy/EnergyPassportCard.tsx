@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { hkd, num, MONTHS, type Home, type PassportMetrics } from "@/lib/energy";
+import { hkd, num, MONTHS, type PassportMetrics } from "@/lib/energy";
 
 const GRADES = ["A", "B", "C", "D", "E"] as const;
 const gradeColor: Record<string, string> = {
@@ -10,15 +10,15 @@ const gradeColor: Record<string, string> = {
   E: "bg-grade-e",
 };
 
-export function EnergyPassportCard({ home, m }: { home: Home; m: PassportMetrics }) {
+export function EnergyPassportCard({ code, name, sub, m }: { code: string; name: string; sub: string; m: PassportMetrics }) {
   return (
     <div className="rounded-lg border bg-card">
       <div className="flex items-start justify-between border-b p-5">
         <div>
-          <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Energy Passport · {home.id.toUpperCase()}</div>
-          <h2 className="mt-1 font-display text-xl font-semibold">{home.name}</h2>
+          <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Energy Passport · {code}</div>
+          <h2 className="mt-1 font-display text-xl font-semibold">{name}</h2>
           <div className="text-sm text-muted-foreground">
-            {home.district} · {num(Number(home.floor_area_m2))} m² · {home.occupants} occupants
+            {sub}
           </div>
         </div>
         <div className="text-right">
@@ -44,11 +44,11 @@ export function EnergyPassportCard({ home, m }: { home: Home; m: PassportMetrics
           {[
             ["Annual use", `${num(m.annualKwh)} kWh`],
             ["Annual cost", hkd(m.annualCost)],
-            ["vs. peer median", `${m.vsPeerPct >= 0 ? "+" : ""}${num(m.vsPeerPct, 1)}%`],
+            ["vs. similar homes", `${m.vsPeerPct >= 0 ? "+" : ""}${num(m.vsPeerPct, 1)}%`],
             ["Intensity", `${num(m.kwhPerM2, 1)} kWh/m²`],
             ["Per person", `${num(m.kwhPerPerson)} kWh`],
             ["Emissions", `${num(m.co2Tonnes, 2)} tCO₂e`],
-            ["Peak month", MONTHS[m.peakMonth]],
+            ["Highest month", MONTHS[m.peakMonth]],
             ["Summer/winter", `${num(m.seasonalityRatio, 1)}×`],
           ].map(([k, v]) => (
             <div key={k}>
