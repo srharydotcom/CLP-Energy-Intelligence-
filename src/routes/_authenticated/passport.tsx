@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { PageHeader } from "@/components/energy/AppShell";
 import { EnergyPassportCard } from "@/components/energy/EnergyPassportCard";
+import { PassportBook, PassportPage, PassportSpread } from "@/components/energy/PassportBook";
 import { AIAnalysisPanel } from "@/components/energy/AIFindingCard";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -69,13 +70,11 @@ function PassportPage() {
   return (
     <>
       {header}
-      <div className="passport-book">
+      <PassportBook label={`Energy passport for ${p.name}`}>
         <EnergyPassportCard code={p.name.slice(0, 12).toUpperCase()} name={p.name} sub={`${p.district || "Hong Kong"} · ${num(u.show(p.areaM2))} ${u.label} · ${p.occupants} people`} m={m} />
 
-        <div className="passport-spread">
-          <section className="passport-leaf">
-            <div className="passport-page-heading"><span>03 / Method</span><span>Energy passport</span></div>
-            <div className="passport-leaf-body">
+        <PassportSpread>
+          <PassportPage n="03" title="Method" footer="How it's calculated">
             <h2 className="mb-5 font-display text-xl font-semibold">How we worked this out</h2>
             <ol className="space-y-3 text-sm">
               <Step n={1} title="Add up your appliances">
@@ -95,13 +94,9 @@ function PassportPage() {
               </Step>
             </ol>
             <p className="mt-3 text-xs text-muted-foreground">The “similar homes” figures are demo numbers, not official statistics.</p>
-            </div>
-            <div className="passport-leaf-footer"><span>How it's calculated</span><span>03</span></div>
-          </section>
+          </PassportPage>
 
-          <section className="passport-leaf">
-            <div className="passport-page-heading"><span>04 / Usage</span><span>Energy passport</span></div>
-            <div className="passport-leaf-body flex flex-col">
+          <PassportPage n="04" title="Usage" footer="Monthly estimate" bodyClassName="flex flex-col">
             <div className="mb-5 font-display text-xl font-semibold">Estimated use by month <span className="font-mono text-xs font-normal text-muted-foreground">· kWh</span></div>
             <div className="min-h-64 flex-1">
               <ResponsiveContainer>
@@ -109,59 +104,49 @@ function PassportPage() {
                   <CartesianGrid vertical={false} stroke="var(--passport-rule)" />
                   <XAxis dataKey="month" stroke="var(--passport-muted)" fontSize={11} />
                   <YAxis stroke="var(--passport-muted)" fontSize={11} />
-                  <Tooltip cursor={{ fill: "var(--muted)" }} contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", fontSize: 12 }} />
+                  <Tooltip cursor={{ fill: "var(--muted)" }} contentStyle={{ background: "var(--passport-paper)", color: "var(--passport-ink)", border: "1px solid var(--passport-rule)", fontSize: 12 }} />
                   <Bar dataKey="kwh" fill="var(--primary)" radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
+          </PassportPage>
+        </PassportSpread>
+
+        <PassportSpread>
+          <PassportPage n="05" title="Inventory" footer="Appliance inventory">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <h2 className="font-display text-xl font-semibold">Appliances in this home</h2>
+              <Button asChild size="sm" variant="outline"><Link to="/home">Edit appliances</Link></Button>
             </div>
-            <div className="passport-leaf-footer"><span>Monthly estimate</span><span>04</span></div>
-          </section>
-        </div>
+            <table className="w-full text-sm">
+              <thead className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                <tr className="border-b text-left"><th className="py-2">Appliance</th><th className="text-right">kWh/yr</th><th className="text-right">Cost/yr</th></tr>
+              </thead>
+              <tbody>
+                {s.rows.map(({ item: x, kwh, cost }) => (
+                  <tr key={x.uid} className="border-b align-top last:border-0">
+                    <td className="py-2.5 pr-3">
+                      <div className="font-medium">{x.quantity > 1 && `${x.quantity}× `}{x.name}</div>
+                      <div className="text-xs text-muted-foreground">{END_USE_LABEL[x.endUse] ?? x.endUse}</div>
+                      <div className="mt-0.5 font-mono text-[11px] text-muted-foreground">{x.watts} W × {x.hoursPerDay} h × {x.daysPerYear} d{x.standbyWatts > 0 && ` + ${x.standbyWatts} W standby`}</div>
+                    </td>
+                    <td className="py-2.5 text-right font-mono tabular-nums">{num(kwh)}</td>
+                    <td className="py-2.5 pl-3 text-right font-mono tabular-nums">{hkd(cost)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </PassportPage>
 
-        <div className="passport-spread">
-          <section className="passport-leaf">
-          <div className="passport-page-heading"><span>05 / Inventory</span><span>Energy passport</span></div>
-          <div className="passport-leaf-body">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="font-display text-xl font-semibold">Appliances in this home</h2>
-            <Button asChild size="sm" variant="outline"><Link to="/home">Edit appliances</Link></Button>
-          </div>
-          <div className="overflow-x-auto"><table className="w-full text-sm">
-            <thead className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              <tr className="border-b text-left"><th className="py-2">Appliance</th><th className="text-right">kWh/yr</th><th className="text-right">Cost/yr</th></tr>
-            </thead>
-            <tbody>
-              {s.rows.map(({ item: x, kwh, cost }) => (
-                <tr key={x.uid} className="border-b align-top last:border-0">
-                  <td className="py-2.5 pr-3">
-                    <div className="font-medium">{x.quantity > 1 && `${x.quantity}× `}{x.name}</div>
-                    <div className="text-xs text-muted-foreground">{END_USE_LABEL[x.endUse] ?? x.endUse}</div>
-                    <div className="mt-0.5 font-mono text-[11px] text-muted-foreground">{x.watts} W × {x.hoursPerDay} h × {x.daysPerYear} d{x.standbyWatts > 0 && ` + ${x.standbyWatts} W standby`}</div>
-                  </td>
-                  <td className="py-2.5 text-right font-mono tabular-nums">{num(kwh)}</td>
-                  <td className="py-2.5 pl-3 text-right font-mono tabular-nums">{hkd(cost)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table></div>
-          </div>
-          <div className="passport-leaf-footer"><span>Appliance inventory</span><span>05</span></div>
-          </section>
-
-          <section className="passport-leaf">
-          <div className="passport-page-heading"><span>06 / Findings</span><span>Energy passport</span></div>
-          <div className="passport-leaf-body">
-          <AIAnalysisPanel
-            module="passport"
-            subjectId={active.id}
-            metrics={{ home: p, grade: r.grade, score: r.score, annual_kwh: Math.round(s.totalKwh), annual_cost_hkd: Math.round(s.totalCost), similar_homes_kwh: Math.round(r.peer), vs_similar_pct: +r.vsPeerPct.toFixed(1), by_end_use_kwh: Object.fromEntries(Object.entries(s.byEndUse).map(([k, v]) => [k, Math.round(v)])), appliances: s.rows.map((x) => ({ name: x.item.name, annual_cost_hkd: Math.round(x.cost) })) }}
-          />
-          </div>
-          <div className="passport-leaf-footer"><span>Findings & advice</span><span>06</span></div>
-          </section>
-        </div>
-      </div>
+          <PassportPage n="06" title="Findings" footer="Findings & advice">
+            <AIAnalysisPanel
+              module="passport"
+              subjectId={active.id}
+              metrics={{ home: p, grade: r.grade, score: r.score, annual_kwh: Math.round(s.totalKwh), annual_cost_hkd: Math.round(s.totalCost), similar_homes_kwh: Math.round(r.peer), vs_similar_pct: +r.vsPeerPct.toFixed(1), by_end_use_kwh: Object.fromEntries(Object.entries(s.byEndUse).map(([k, v]) => [k, Math.round(v)])), appliances: s.rows.map((x) => ({ name: x.item.name, annual_cost_hkd: Math.round(x.cost) })) }}
+            />
+          </PassportPage>
+        </PassportSpread>
+      </PassportBook>
     </>
   );
 }
