@@ -38,9 +38,11 @@ export function Tour({ mode }: { mode: "household" | "business" }) {
   const [rect, setRect] = useState<DOMRect | null>(null);
   const steps = mode === "business" ? BUSINESS_STEPS : HOUSEHOLD_STEPS;
 
+  // Auto-start once per session for new users; never restart after it's been closed.
+  const [autoDone, setAutoDone] = useState(false);
   useEffect(() => {
-    if (profile && !profile.tour_done && i === null) setI(0);
-  }, [profile, i]);
+    if (profile && !profile.tour_done && !autoDone) { setAutoDone(true); setI(0); }
+  }, [profile, autoDone]);
   useEffect(() => {
     const h = () => setI(0);
     window.addEventListener("clp:start-tour", h);
