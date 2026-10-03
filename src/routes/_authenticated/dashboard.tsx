@@ -49,7 +49,7 @@ function HouseholdDashboard({ name }: { name: string | null }) {
         right={<Button onClick={() => create.mutate({ name: `Home ${homes.length + 1}` })} disabled={create.isPending}><Plus className="size-4" /> Add a home</Button>} />
 
       {homes.length > 0 && (
-        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4 md:auto-rows-fr">
           <div className="relative overflow-hidden rounded-2xl border bg-card p-6 md:col-span-2 md:row-span-2">
             <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
               <span className="size-1.5 animate-pulse rounded-full bg-positive" /> Electricity, all homes
@@ -121,8 +121,8 @@ function HouseholdDashboard({ name }: { name: string | null }) {
 
 function Tile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border bg-card p-4">
-      <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">{label}</div>
+    <div className="h-full rounded-2xl border bg-card p-4">
+      <div className="flex h-full flex-col justify-center rounded-xl">
       <div className="mt-1 font-mono text-2xl font-semibold tracking-tight tabular-nums">{value}</div>
     </div>
   );
