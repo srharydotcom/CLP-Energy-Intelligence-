@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { useMyHome } from "@/lib/my-home";
+import { homeContext, useHomes } from "@/lib/my-home";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { PageHeader } from "@/components/energy/AppShell";
 import { ProductComparisonTable } from "@/components/energy/ProductComparisonTable";
 import { EnergyCostCard, LifetimeCostCard, PaybackCard, SavingsCard } from "@/components/energy/MetricCards";
@@ -20,7 +21,7 @@ import {
   type HouseholdContext, type Product,
 } from "@/lib/energy";
 
-export const Route = createFileRoute("/buy")({
+export const Route = createFileRoute("/_authenticated/buy")({
   head: () => ({
     meta: [
       { title: "Should I Buy This? — CLP Energy Intelligence" },
@@ -40,6 +41,14 @@ const USAGE_BASIS: Record<string, { basis: string; ref: number; elasticity: numb
   "Water heater": { basis: "occupants", ref: 3, elasticity: 1, unit: "L" },
   EV: { basis: "km", ref: 12000, elasticity: 1, unit: "kWh" },
   "Home battery": { basis: "fixed", ref: 1, elasticity: 1, unit: "kWh" },
+  TV: { basis: "fixed", ref: 1, elasticity: 1, unit: "in" },
+  "Washing machine": { basis: "occupants", ref: 3, elasticity: 0.8, unit: "kg" },
+  Dryer: { basis: "occupants", ref: 3, elasticity: 0.8, unit: "kg" },
+  Dishwasher: { basis: "occupants", ref: 3, elasticity: 0.7, unit: null },
+  Dehumidifier: { basis: "area", ref: 50, elasticity: 0.6, unit: "L/day" },
+  Cooktop: { basis: "occupants", ref: 3, elasticity: 0.8, unit: null },
+  Lighting: { basis: "area", ref: 55, elasticity: 1, unit: null },
+  Other: { basis: "fixed", ref: 1, elasticity: 1, unit: null },
 };
 
 function NumField({ label, value, onChange, step = 1, hint }: { label: string; value: number; onChange: (n: number) => void; step?: number; hint?: string }) {
@@ -55,7 +64,7 @@ function NumField({ label, value, onChange, step = 1, hint }: { label: string; v
 function AddProductDialog({ category, onAdd }: { category: string; onAdd: (p: Product) => void }) {
   const [open, setOpen] = useState(false);
   const [f, setF] = useState({ brand: "", model: "", price: 8000, annual_kwh: 800, lifetime_years: 10, maintenance_per_year: 200, capacity: 3.5, shift_kwh: 0 });
-  const meta = USAGE_BASIS[category] ?? USAGE_BASIS["Air conditioner"]!;
+  const meta = USAGE_BASIS[category] ?? USAGE_BASIS["Other"]!;
   const set = (k: keyof typeof f) => (v: number | string) => setF({ ...f, [k]: v });
   const submit = () => {
     onAdd({
@@ -99,17 +108,17 @@ function BuyPage() {
   const [tariffId, setTariffId] = useState<string>();
   const [ctx, setCtx] = useState<HouseholdContext>({ areaM2: 68, roomM2: 18, occupants: 3, acHoursPerDay: 8, evKmPerYear: 12000 });
 
-  const myHome = useMyHome();
+  const myHomes = useHomes();
   useEffect(() => {
-    if (myHome.saved) setHomeId("my-home");
-  }, [myHome.saved]);
+    if (myHomes.active && homeId === "home-1") setHomeId(`mine:${myHomes.active.id}`);
+  }, [myHomes.active, homeId]);
+  const mine = homeId.startsWith("mine:") ? myHomes.homes.find((h) => `mine:${h.id}` === homeId) : undefined;
   useEffect(() => {
-    if (homeId === "my-home" && myHome.saved) {
-      const p = myHome.home.profile;
-      setCtx((c) => ({ ...c, areaM2: p.areaM2, occupants: p.occupants, acHoursPerDay: p.acHoursPerDay }));
-      setTariffId(p.tariffId);
+    if (mine) {
+      setCtx((c) => ({ ...homeContext(mine.profile), evKmPerYear: mine.profile.evKmPerYear || c.evKmPerYear }));
+      setTariffId(mine.profile.tariffId);
     }
-  }, [homeId, myHome.saved, myHome.home.profile]);
+  }, [mine]);
   const home = homes.data?.find((h) => h.id === homeId);
   useEffect(() => {
     if (home) {
@@ -134,7 +143,20 @@ function BuyPage() {
   const cand = rows.find((r) => r.product.id === selected) ?? best;
 
   const header = <PageHeader kicker="Module 02" title="Should I Buy This?" sub="Cost a product in your own home — its size, your household and your tariff — and compare its total cost of ownership with the alternatives." />;
-  if (!tariff || !cand || !baseline || !best) return <>{header}<Skeleton className="h-96" /></>;
+  if (!tariff || products.isLoading) return <>{header}<Skeleton className="h-96" /></>;
+  if (!cand || !baseline || !best) return (
+    <>{header}
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <Tabs value={category} onValueChange={(c) => { setCategory(c); setSelected(undefined); }}>
+          <TabsList className="flex-wrap">{[...categories, ...(categories.includes("Other") ? [] : ["Other"])].map((c) => <TabsTrigger key={c} value={c}>{c === "Other" ? "Something else" : c}</TabsTrigger>)}</TabsList>
+        </Tabs>
+      </div>
+      <div className="rounded-lg border border-dashed p-10 text-center">
+        <p className="mb-4 text-muted-foreground">Nothing to compare here yet. Add the products you're choosing between — at least two.</p>
+        <AddProductDialog category={category} onAdd={(p) => { setCustom((c) => [...c, p]); setSelected(p.id); }} />
+      </div>
+    </>
+  );
 
   const pb = payback(cand, baseline);
   const be = breakEvenYear(cand, baseline);
@@ -146,20 +168,13 @@ function BuyPage() {
       {header}
       <div className="mb-5 grid gap-3 rounded-lg border bg-card p-4 sm:grid-cols-3 lg:grid-cols-6">
         <div className="sm:col-span-1 lg:col-span-2">
-          <Label className="text-xs text-muted-foreground">Energy Passport</Label>
+          <Label className="text-xs text-muted-foreground">Which home</Label>
           <Select value={homeId} onValueChange={setHomeId}>
             <SelectTrigger className="mt-1 h-9"><SelectValue /></SelectTrigger>
             <SelectContent>
-              {myHome.saved && <SelectItem value="my-home">My home ({myHome.home.profile.name})</SelectItem>}
-              {homes.data?.map((h) => <SelectItem key={h.id} value={h.id}>{h.name}</SelectItem>)}
+              {myHomes.homes.map((h) => <SelectItem key={h.id} value={`mine:${h.id}`}>{h.profile.name}</SelectItem>)}
+              {homes.data?.map((h) => <SelectItem key={h.id} value={h.id}>Example: {h.name}</SelectItem>)}
             </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label className="text-xs text-muted-foreground">Tariff</Label>
-          <Select value={tariff.id} onValueChange={setTariffId}>
-            <SelectTrigger className="mt-1 h-9"><SelectValue /></SelectTrigger>
-            <SelectContent>{tariffs.data?.filter((t) => t.segment === "residential").map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
         {category === "Air conditioner" ? (
@@ -177,9 +192,9 @@ function BuyPage() {
 
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <Tabs value={category} onValueChange={(c) => { setCategory(c); setSelected(undefined); }}>
-          <TabsList className="flex-wrap">{categories.map((c) => <TabsTrigger key={c} value={c}>{c}</TabsTrigger>)}</TabsList>
+          <TabsList className="flex-wrap">{[...categories, ...(categories.includes("Other") ? [] : ["Other"])].map((c) => <TabsTrigger key={c} value={c}>{c === "Other" ? "Something else" : c}</TabsTrigger>)}</TabsList>
         </Tabs>
-        {USAGE_BASIS[category] && <AddProductDialog category={category} onAdd={(p) => { setCustom((c) => [...c, p]); setSelected(p.id); }} />}
+        {<AddProductDialog category={category} onAdd={(p) => { setCustom((c) => [...c, p]); setSelected(p.id); }} />}
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[1fr_300px]">
@@ -209,7 +224,7 @@ function BuyPage() {
             <div className="text-sm text-muted-foreground">Includes {hkd(cand.annualShiftSaving)}/yr from moving {num(Number(cand.product.shift_kwh))} kWh from peak to off-peak on your tariff.</div>
           )}
           {cand.product.category === "Home battery" && cand.annualShiftSaving === 0 && (
-            <div className="text-sm text-warning">Your tariff has no peak/off-peak split, so a battery cannot save money by shifting usage. Try the Time-of-Use tariff.</div>
+            <div className="text-sm text-warning">Your electricity plan charges the same price all day, so a battery can&apos;t save you money. It only pays off on a plan with cheaper night-time electricity (see Advanced).</div>
           )}
 
           <AIAnalysisPanel
@@ -218,7 +233,7 @@ function BuyPage() {
             metrics={{
               category,
               tariff: tariff.name,
-              household: { passport: homeId === "my-home" ? myHome.home.profile.name : home?.name, ...ctx, peer_median_kwh: home ? Number(home.peer_median_kwh) : null },
+              household: { passport: mine ? mine.profile.name : home?.name, ...ctx, peer_median_kwh: home ? Number(home.peer_median_kwh) : null },
               horizon_years: H,
               best_choice: best.product.id,
               candidate: { ...cand.product, size_fit: cand.fit, required_capacity: cand.required, usage_factor: cand.usageFactor, annual_kwh_in_home: cand.annualKwh, annual_cost: cand.annualCost, lifetime_cost_pv: cand.lifetimeCost, horizon_tco_pv: cand.horizonTco, lifetime_co2_kg: cand.lifetimeCo2Kg, shift_saving: cand.annualShiftSaving },
@@ -230,7 +245,16 @@ function BuyPage() {
             }}
           />
         </div>
-        <div className="space-y-4">
+        <Collapsible className="space-y-4">
+          <CollapsibleTrigger asChild><Button variant="outline" className="w-full">Advanced: electricity plan & assumptions</Button></CollapsibleTrigger>
+          <CollapsibleContent className="space-y-4">
+          <div className="rounded-lg border bg-card p-4">
+            <Label className="text-xs text-muted-foreground">Electricity plan</Label>
+            <Select value={tariff.id} onValueChange={setTariffId}>
+              <SelectTrigger className="mt-1 h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>{tariffs.data?.filter((t) => t.segment === "residential").map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
           <AssumptionPanel value={a} onChange={setA} fields={["horizonYears", "tariffEscalationPct", "discountRatePct", "fuelAdjDelta", "usageChangePct", "carbonPricePerTonne"]} />
           <div className="rounded-lg border bg-card p-4 text-xs text-muted-foreground space-y-1.5">
             <div className="font-mono text-[11px] uppercase tracking-widest">How we estimate</div>
@@ -239,7 +263,8 @@ function BuyPage() {
             <p>Cost to own = purchase (with replacements inside the horizon) + energy + upkeep, discounted to today. Break-even uses cumulative spend.</p>
             <p>Electricity: {hkd(effectiveRate(tariff, a), 2)}/kWh on {tariff.name}.</p>
           </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
     </>
   );

@@ -10,83 +10,130 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as BuildingsRouteImport } from './routes/buildings'
-import { Route as BuyRouteImport } from './routes/buy'
-import { Route as HomeRouteImport } from './routes/home'
-import { Route as PassportRouteImport } from './routes/passport'
-import { Route as ProcurementRouteImport } from './routes/procurement'
-import { Route as ScenariosRouteImport } from './routes/scenarios'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedBuildingsRouteImport } from './routes/_authenticated/buildings'
+import { Route as AuthenticatedBuyRouteImport } from './routes/_authenticated/buy'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/help'
+import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
+import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedPassportRouteImport } from './routes/_authenticated/passport'
+import { Route as AuthenticatedProcurementRouteImport } from './routes/_authenticated/procurement'
+import { Route as AuthenticatedScenariosRouteImport } from './routes/_authenticated/scenarios'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BuildingsRoute = BuildingsRouteImport.update({
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedBuildingsRoute = AuthenticatedBuildingsRouteImport.update({
   id: '/buildings',
   path: '/buildings',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const BuyRoute = BuyRouteImport.update({
+const AuthenticatedBuyRoute = AuthenticatedBuyRouteImport.update({
   id: '/buy',
   path: '/buy',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const HomeRoute = HomeRouteImport.update({
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHelpRoute = AuthenticatedHelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   id: '/home',
   path: '/home',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const PassportRoute = PassportRouteImport.update({
+const AuthenticatedPassportRoute = AuthenticatedPassportRouteImport.update({
   id: '/passport',
   path: '/passport',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ProcurementRoute = ProcurementRouteImport.update({
-  id: '/procurement',
-  path: '/procurement',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ScenariosRoute = ScenariosRouteImport.update({
+const AuthenticatedProcurementRoute =
+  AuthenticatedProcurementRouteImport.update({
+    id: '/procurement',
+    path: '/procurement',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedScenariosRoute = AuthenticatedScenariosRouteImport.update({
   id: '/scenarios',
   path: '/scenarios',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/buildings': typeof BuildingsRoute
-  '/buy': typeof BuyRoute
-  '/home': typeof HomeRoute
-  '/passport': typeof PassportRoute
-  '/procurement': typeof ProcurementRoute
-  '/scenarios': typeof ScenariosRoute
+  '/auth': typeof AuthRoute
+  '/buildings': typeof AuthenticatedBuildingsRoute
+  '/buy': typeof AuthenticatedBuyRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/help': typeof AuthenticatedHelpRoute
+  '/history': typeof AuthenticatedHistoryRoute
+  '/home': typeof AuthenticatedHomeRoute
+  '/passport': typeof AuthenticatedPassportRoute
+  '/procurement': typeof AuthenticatedProcurementRoute
+  '/scenarios': typeof AuthenticatedScenariosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/buildings': typeof BuildingsRoute
-  '/buy': typeof BuyRoute
-  '/home': typeof HomeRoute
-  '/passport': typeof PassportRoute
-  '/procurement': typeof ProcurementRoute
-  '/scenarios': typeof ScenariosRoute
+  '/auth': typeof AuthRoute
+  '/buildings': typeof AuthenticatedBuildingsRoute
+  '/buy': typeof AuthenticatedBuyRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/help': typeof AuthenticatedHelpRoute
+  '/history': typeof AuthenticatedHistoryRoute
+  '/home': typeof AuthenticatedHomeRoute
+  '/passport': typeof AuthenticatedPassportRoute
+  '/procurement': typeof AuthenticatedProcurementRoute
+  '/scenarios': typeof AuthenticatedScenariosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/buildings': typeof BuildingsRoute
-  '/buy': typeof BuyRoute
-  '/home': typeof HomeRoute
-  '/passport': typeof PassportRoute
-  '/procurement': typeof ProcurementRoute
-  '/scenarios': typeof ScenariosRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/buildings': typeof AuthenticatedBuildingsRoute
+  '/_authenticated/buy': typeof AuthenticatedBuyRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/help': typeof AuthenticatedHelpRoute
+  '/_authenticated/history': typeof AuthenticatedHistoryRoute
+  '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/passport': typeof AuthenticatedPassportRoute
+  '/_authenticated/procurement': typeof AuthenticatedProcurementRoute
+  '/_authenticated/scenarios': typeof AuthenticatedScenariosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/buildings'
     | '/buy'
+    | '/dashboard'
+    | '/help'
+    | '/history'
     | '/home'
     | '/passport'
     | '/procurement'
@@ -94,8 +141,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/buildings'
     | '/buy'
+    | '/dashboard'
+    | '/help'
+    | '/history'
     | '/home'
     | '/passport'
     | '/procurement'
@@ -103,22 +154,23 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/buildings'
-    | '/buy'
-    | '/home'
-    | '/passport'
-    | '/procurement'
-    | '/scenarios'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/buildings'
+    | '/_authenticated/buy'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/help'
+    | '/_authenticated/history'
+    | '/_authenticated/home'
+    | '/_authenticated/passport'
+    | '/_authenticated/procurement'
+    | '/_authenticated/scenarios'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  BuildingsRoute: typeof BuildingsRoute
-  BuyRoute: typeof BuyRoute
-  HomeRoute: typeof HomeRoute
-  PassportRoute: typeof PassportRoute
-  ProcurementRoute: typeof ProcurementRoute
-  ScenariosRoute: typeof ScenariosRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -130,59 +182,117 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/buildings': {
-      id: '/buildings'
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/buildings': {
+      id: '/_authenticated/buildings'
       path: '/buildings'
       fullPath: '/buildings'
-      preLoaderRoute: typeof BuildingsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedBuildingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/buy': {
-      id: '/buy'
+    '/_authenticated/buy': {
+      id: '/_authenticated/buy'
       path: '/buy'
       fullPath: '/buy'
-      preLoaderRoute: typeof BuyRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedBuyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/home': {
-      id: '/home'
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/help': {
+      id: '/_authenticated/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof AuthenticatedHelpRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/history': {
+      id: '/_authenticated/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AuthenticatedHistoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/home': {
+      id: '/_authenticated/home'
       path: '/home'
       fullPath: '/home'
-      preLoaderRoute: typeof HomeRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedHomeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/passport': {
-      id: '/passport'
+    '/_authenticated/passport': {
+      id: '/_authenticated/passport'
       path: '/passport'
       fullPath: '/passport'
-      preLoaderRoute: typeof PassportRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPassportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/procurement': {
-      id: '/procurement'
+    '/_authenticated/procurement': {
+      id: '/_authenticated/procurement'
       path: '/procurement'
       fullPath: '/procurement'
-      preLoaderRoute: typeof ProcurementRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedProcurementRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/scenarios': {
-      id: '/scenarios'
+    '/_authenticated/scenarios': {
+      id: '/_authenticated/scenarios'
       path: '/scenarios'
       fullPath: '/scenarios'
-      preLoaderRoute: typeof ScenariosRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedScenariosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBuildingsRoute: typeof AuthenticatedBuildingsRoute
+  AuthenticatedBuyRoute: typeof AuthenticatedBuyRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedHelpRoute: typeof AuthenticatedHelpRoute
+  AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
+  AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedPassportRoute: typeof AuthenticatedPassportRoute
+  AuthenticatedProcurementRoute: typeof AuthenticatedProcurementRoute
+  AuthenticatedScenariosRoute: typeof AuthenticatedScenariosRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBuildingsRoute: AuthenticatedBuildingsRoute,
+  AuthenticatedBuyRoute: AuthenticatedBuyRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedHelpRoute: AuthenticatedHelpRoute,
+  AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
+  AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedPassportRoute: AuthenticatedPassportRoute,
+  AuthenticatedProcurementRoute: AuthenticatedProcurementRoute,
+  AuthenticatedScenariosRoute: AuthenticatedScenariosRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  BuildingsRoute: BuildingsRoute,
-  BuyRoute: BuyRoute,
-  HomeRoute: HomeRoute,
-  PassportRoute: PassportRoute,
-  ProcurementRoute: ProcurementRoute,
-  ScenariosRoute: ScenariosRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

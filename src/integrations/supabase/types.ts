@@ -22,6 +22,7 @@ export type Database = {
           module: string
           output: Json
           subject_id: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -30,6 +31,7 @@ export type Database = {
           module: string
           output: Json
           subject_id?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -38,6 +40,7 @@ export type Database = {
           module?: string
           output?: Json
           subject_id?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -319,6 +322,33 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          tour_done: boolean
+          updated_at: string
+          user_type: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id: string
+          tour_done?: boolean
+          updated_at?: string
+          user_type?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          tour_done?: boolean
+          updated_at?: string
+          user_type?: string
+        }
+        Relationships: []
+      }
       tariffs: {
         Row: {
           carbon_kg_per_kwh: number
@@ -352,6 +382,33 @@ export type Database = {
           offpeak_rate?: number | null
           peak_rate?: number | null
           segment?: string
+        }
+        Relationships: []
+      }
+      user_homes: {
+        Row: {
+          appliances: Json
+          created_at: string
+          id: string
+          profile: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          appliances?: Json
+          created_at?: string
+          id?: string
+          profile: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          appliances?: Json
+          created_at?: string
+          id?: string
+          profile?: Json
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
