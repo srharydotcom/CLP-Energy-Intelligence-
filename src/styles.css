@@ -310,6 +310,7 @@
 @media (max-width: 760px) {
   .passport-spread { grid-template-columns: minmax(0, 1fr); }
   .passport-cover { min-height: 390px; border-radius: 6px 6px 0 0; }
+  .passport-preview { min-height: 175px; height: 175px; border-radius: 4px; }
   .passport-sheet { border-left: 1px solid var(--passport-rule); border-top: 5px double var(--passport-rule); border-radius: 0 0 6px 6px; }
   .passport-cover-mark { font-size: 120px; }
 }
