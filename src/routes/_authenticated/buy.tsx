@@ -1,4 +1,5 @@
 import { useAreaUnit } from "@/lib/units";
+import { AreaUnitToggle } from "@/components/energy/AreaUnitToggle";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
@@ -220,7 +221,7 @@ function BuyPage() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {fields.map((f) => (
           <div key={f.key}>
-            <Label className="text-xs text-muted-foreground">{f.label}{isArea(f.key) ? ` (${u.label})` : ""}{f.optional ? " (optional)" : ""}</Label>
+            <Label className="text-xs text-muted-foreground">{f.label}{f.optional ? " (optional)" : ""}{isArea(f.key) && <AreaUnitToggle />}</Label>
             <Input type="number" min={0} step={f.step ?? 1} className="mt-1 h-9 font-mono" value={req[f.key] == null ? "" : isArea(f.key) ? u.show(req[f.key]!) : req[f.key]} placeholder="—"
               onChange={(e) => setReq({ ...req, [f.key]: e.target.value === "" ? undefined : isArea(f.key) ? u.toM2(Number(e.target.value)) : Number(e.target.value) })} />
             <div className="mt-1 text-[11px] text-muted-foreground">{f.hint}</div>
