@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { PageHeader } from "@/components/energy/AppShell";
 import { EnergyPassportCard } from "@/components/energy/EnergyPassportCard";
-import { PassportBook, PassportPage, PassportSpread } from "@/components/energy/PassportBook";
+import { PassportBook, PassportPage as Leaf, PassportSpread } from "@/components/energy/PassportBook";
 import { AIAnalysisPanel } from "@/components/energy/AIFindingCard";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -74,7 +74,7 @@ function PassportPage() {
         <EnergyPassportCard code={p.name.slice(0, 12).toUpperCase()} name={p.name} sub={`${p.district || "Hong Kong"} · ${num(u.show(p.areaM2))} ${u.label} · ${p.occupants} people`} m={m} />
 
         <PassportSpread>
-          <PassportPage n="03" title="Method" footer="How it's calculated">
+          <Leaf n="03" title="Method" footer="How it's calculated">
             <h2 className="mb-5 font-display text-xl font-semibold">How we worked this out</h2>
             <ol className="space-y-3 text-sm">
               <Step n={1} title="Add up your appliances">
@@ -94,9 +94,9 @@ function PassportPage() {
               </Step>
             </ol>
             <p className="mt-3 text-xs text-muted-foreground">The “similar homes” figures are demo numbers, not official statistics.</p>
-          </PassportPage>
+          </Leaf>
 
-          <PassportPage n="04" title="Usage" footer="Monthly estimate" bodyClassName="flex flex-col">
+          <Leaf n="04" title="Usage" footer="Monthly estimate" bodyClassName="flex flex-col">
             <div className="mb-5 font-display text-xl font-semibold">Estimated use by month <span className="font-mono text-xs font-normal text-muted-foreground">· kWh</span></div>
             <div className="min-h-64 flex-1">
               <ResponsiveContainer>
@@ -109,11 +109,11 @@ function PassportPage() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </PassportPage>
+          </Leaf>
         </PassportSpread>
 
         <PassportSpread>
-          <PassportPage n="05" title="Inventory" footer="Appliance inventory">
+          <Leaf n="05" title="Inventory" footer="Appliance inventory">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h2 className="font-display text-xl font-semibold">Appliances in this home</h2>
               <Button asChild size="sm" variant="outline"><Link to="/home">Edit appliances</Link></Button>
@@ -136,15 +136,15 @@ function PassportPage() {
                 ))}
               </tbody>
             </table>
-          </PassportPage>
+          </Leaf>
 
-          <PassportPage n="06" title="Findings" footer="Findings & advice">
+          <Leaf n="06" title="Findings" footer="Findings & advice">
             <AIAnalysisPanel
               module="passport"
               subjectId={active.id}
               metrics={{ home: p, grade: r.grade, score: r.score, annual_kwh: Math.round(s.totalKwh), annual_cost_hkd: Math.round(s.totalCost), similar_homes_kwh: Math.round(r.peer), vs_similar_pct: +r.vsPeerPct.toFixed(1), by_end_use_kwh: Object.fromEntries(Object.entries(s.byEndUse).map(([k, v]) => [k, Math.round(v)])), appliances: s.rows.map((x) => ({ name: x.item.name, annual_cost_hkd: Math.round(x.cost) })) }}
             />
-          </PassportPage>
+          </Leaf>
         </PassportSpread>
       </PassportBook>
     </>
