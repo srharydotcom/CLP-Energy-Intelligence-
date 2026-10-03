@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/help")({
   component: HelpPage,
 });
 
-const GUIDE: { section: string; items: { q: string; to?: string; steps: string[] }[] }[] = [
+const GUIDE: { section: string; items: { q: string; to?: "/dashboard" | "/home" | "/passport" | "/buy" | "/buildings" | "/procurement" | "/scenarios" | "/history"; steps: string[] }[] }[] = [
   {
     section: "Getting started",
     items: [
