@@ -1,48 +1,5 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1791014313188,
-      "tag": "0000_energy_schema",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1791015417062,
-      "tag": "0001_product_context",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1791015558958,
-      "tag": "0002_ac_room_reference",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1791016047101,
-      "tag": "0003_appliances_and_buildings",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1791018781418,
-      "tag": "0004_accounts_and_homes",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1791023692635,
-      "tag": "0005_real_hk_prices",
-      "breakpoints": true
-    }
-  ]
+  "entries": []
 }
