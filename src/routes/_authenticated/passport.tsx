@@ -127,18 +127,20 @@ function PassportPage() {
             <h2 className="font-display text-xl font-semibold">Appliances in this home</h2>
             <Button asChild size="sm" variant="outline"><Link to="/home">Edit appliances</Link></Button>
           </div>
-          <div className="overflow-x-auto"><table className="min-w-[560px] w-full text-sm">
-            <thead className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-              <tr className="border-b text-left"><th className="py-2">Appliance</th><th>Used for</th><th className="text-right">Working out</th><th className="text-right">kWh/yr</th><th className="text-right">Cost/yr</th></tr>
+          <div className="overflow-x-auto"><table className="w-full text-sm">
+            <thead className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <tr className="border-b text-left"><th className="py-2">Appliance</th><th className="text-right">kWh/yr</th><th className="text-right">Cost/yr</th></tr>
             </thead>
             <tbody>
               {s.rows.map(({ item: x, kwh, cost }) => (
-                <tr key={x.uid} className="border-b last:border-0">
-                  <td className="py-2 font-medium">{x.quantity > 1 && `${x.quantity}× `}{x.name}</td>
-                  <td className="text-muted-foreground">{END_USE_LABEL[x.endUse] ?? x.endUse}</td>
-                  <td className="text-right font-mono text-xs text-muted-foreground">{x.watts} W × {x.hoursPerDay} h × {x.daysPerYear} d{x.standbyWatts > 0 && ` + ${x.standbyWatts} W standby`}</td>
-                  <td className="text-right font-mono tabular-nums">{num(kwh)}</td>
-                  <td className="text-right font-mono tabular-nums">{hkd(cost)}</td>
+                <tr key={x.uid} className="border-b align-top last:border-0">
+                  <td className="py-2.5 pr-3">
+                    <div className="font-medium">{x.quantity > 1 && `${x.quantity}× `}{x.name}</div>
+                    <div className="text-xs text-muted-foreground">{END_USE_LABEL[x.endUse] ?? x.endUse}</div>
+                    <div className="mt-0.5 font-mono text-[11px] text-muted-foreground">{x.watts} W × {x.hoursPerDay} h × {x.daysPerYear} d{x.standbyWatts > 0 && ` + ${x.standbyWatts} W standby`}</div>
+                  </td>
+                  <td className="py-2.5 text-right font-mono tabular-nums">{num(kwh)}</td>
+                  <td className="py-2.5 pl-3 text-right font-mono tabular-nums">{hkd(cost)}</td>
                 </tr>
               ))}
             </tbody>
