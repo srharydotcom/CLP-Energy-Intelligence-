@@ -166,7 +166,8 @@ export interface HouseholdContext {
   occupants: number;
   acHoursPerDay: number;
   evKmPerYear: number;
-  coolingFactor?: number; // sun exposure / floor / building age multiplier on AC use
+  ratioOverride?: number | undefined; // usage vs the product's reference use (e.g. hours/day ÷ typical)
+  coolingFactor?: number | undefined; // sun exposure / floor / building age multiplier on AC use
 }
 export const AC_REF_HOURS = 8;
 
@@ -192,7 +193,8 @@ export function usageFactor(p: Product, ctx: HouseholdContext): number {
   const ref = Number(p.reference_value) || 1;
   const e = Number(p.usage_elasticity);
   let ratio = 1;
-  if (p.usage_basis === "area") ratio = p.category === "Air conditioner" ? (ctx.roomM2 / ref) * (ctx.acHoursPerDay / AC_REF_HOURS) : ctx.areaM2 / ref;
+  if (ctx.ratioOverride != null) ratio = ctx.ratioOverride;
+  else if (p.usage_basis === "area") ratio = p.category === "Air conditioner" ? (ctx.roomM2 / ref) * (ctx.acHoursPerDay / AC_REF_HOURS) : ctx.areaM2 / ref;
   else if (p.usage_basis === "occupants") ratio = ctx.occupants / ref;
   else if (p.usage_basis === "km") ratio = ctx.evKmPerYear / ref;
   let f = Math.max(0.1, 1 + e * (ratio - 1));
