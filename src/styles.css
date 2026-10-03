@@ -216,6 +216,11 @@
   .passport-cover-bottom { padding-top: 12px; border-top: 1px solid var(--passport-rule); }
   .passport-cover-center { position: relative; display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; text-align: center; isolation: isolate; }
   .passport-cover-mark { position: absolute; z-index: -1; font: 700 160px var(--font-display); color: color-mix(in oklch, var(--primary) 7%, transparent); transform: rotate(-20deg); user-select: none; }
+  .passport-preview { min-height: 175px; height: 175px; border-radius: 4px; transform: rotate(-4deg); }
+  .passport-preview .passport-spine { width: 10px; }
+  .passport-preview .passport-cover-inner { margin: 4px 4px 4px 12px; padding: 11px; }
+  .passport-preview .passport-seal { width: 43px; height: 43px; border-width: 3px; font-size: 6px; }
+  .passport-preview .passport-seal span:first-child { font-size: 12px; }
   .passport-seal {
     width: 116px;
     height: 116px;
