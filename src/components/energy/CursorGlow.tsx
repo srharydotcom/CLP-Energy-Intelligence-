@@ -5,7 +5,7 @@ export function CursorGlow() {
   const glow = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    if (!window.matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)").matches) return;
     const light = glow.current;
     if (!light) return;
 
@@ -22,7 +22,7 @@ export function CursorGlow() {
         light.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
         light.style.opacity = "1";
         const next = (document.elementFromPoint(x, y) as HTMLElement | null)?.closest<HTMLElement>(
-          ".bg-card, .passport-sheet, .passport-cover, .bg-popover, aside, button, a, input, select, textarea",
+          ".passport-page, .passport-analysis, .passport-sheet, .passport-cover, .bg-card, .bg-popover, aside, button, a, input, select, textarea",
         ) ?? null;
         if (surface && surface !== next) surface.classList.remove("cursor-lit");
         surface = next;

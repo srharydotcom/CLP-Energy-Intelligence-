@@ -102,9 +102,9 @@ function PassportPage() {
             <div className="h-64">
               <ResponsiveContainer>
                 <BarChart data={months}>
-                  <CartesianGrid vertical={false} stroke="var(--border)" />
-                  <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={11} />
-                  <YAxis stroke="var(--muted-foreground)" fontSize={11} />
+                  <CartesianGrid vertical={false} stroke="var(--passport-rule)" />
+                  <XAxis dataKey="month" stroke="var(--passport-muted)" fontSize={11} />
+                  <YAxis stroke="var(--passport-muted)" fontSize={11} />
                   <Tooltip cursor={{ fill: "var(--muted)" }} contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", fontSize: 12 }} />
                   <Bar dataKey="kwh" fill="var(--primary)" radius={[3, 3, 0, 0]} />
                 </BarChart>
