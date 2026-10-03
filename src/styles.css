@@ -208,8 +208,7 @@
   .passport-leaf > .passport-leaf-body > .bg-card { padding: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important; backdrop-filter: none !important; color: var(--passport-ink); }
   .passport-leaf .border-dashed, .passport-leaf .rounded-md.border { border-color: var(--passport-rule) !important; }
   /* Outline buttons printed onto the paper instead of dark glass. */
-  .passport-leaf:not(.passport-leaf--cover) [data-slot="button"].border,
-  .passport-leaf:not(.passport-leaf--cover) a.border.bg-background { background: transparent !important; border-color: var(--passport-ink) !important; color: var(--passport-ink) !important; }
+  .passport-leaf:not(.passport-leaf--cover) .border-input.bg-background { background: transparent !important; border-color: var(--passport-ink) !important; color: var(--passport-ink) !important; }
 
   /* Cover page: cloth-bound, framed with a gold rule. */
   .passport-leaf--cover {
