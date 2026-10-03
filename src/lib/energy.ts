@@ -166,8 +166,8 @@ export interface HouseholdContext {
   occupants: number;
   acHoursPerDay: number;
   evKmPerYear: number;
-  ratioOverride?: number; // usage vs the product's reference use (e.g. hours/day ÷ typical)
-  coolingFactor?: number; // sun exposure / floor / building age multiplier on AC use
+  ratioOverride?: number | undefined; // usage vs the product's reference use (e.g. hours/day ÷ typical)
+  coolingFactor?: number | undefined; // sun exposure / floor / building age multiplier on AC use
 }
 export const AC_REF_HOURS = 8;
 
