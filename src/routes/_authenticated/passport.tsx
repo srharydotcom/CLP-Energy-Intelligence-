@@ -72,7 +72,7 @@ function PassportPage() {
       <div className="passport-pages space-y-5">
         <EnergyPassportCard code={p.name.slice(0, 12).toUpperCase()} name={p.name} sub={`${p.district || "Hong Kong"} · ${num(u.show(p.areaM2))} ${u.label} · ${p.occupants} people`} m={m} />
 
-        <div className="grid gap-5 lg:grid-cols-2">
+        <div className="passport-four-sections">
           <section className="passport-page p-5 sm:p-6">
             <div className="passport-page-heading"><span>03 / Method</span><span>Energy passport</span></div>
             <h2 className="mb-5 font-display text-xl font-semibold">How we worked this out</h2>
@@ -111,9 +111,7 @@ function PassportPage() {
               </ResponsiveContainer>
             </div>
           </section>
-        </div>
-
-        <section className="passport-page p-5 sm:p-6">
+          <section className="passport-page p-5 sm:p-6">
           <div className="passport-page-heading"><span>05 / Inventory</span><span>Energy passport</span></div>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="font-display text-xl font-semibold">Appliances in this home</h2>
@@ -135,15 +133,16 @@ function PassportPage() {
               ))}
             </tbody>
           </table></div>
-        </section>
+          </section>
 
-        <div className="passport-analysis">
+          <div className="passport-analysis">
           <div className="passport-page-heading"><span>06 / Findings</span><span>Energy passport</span></div>
           <AIAnalysisPanel
             module="passport"
             subjectId={active.id}
             metrics={{ home: p, grade: r.grade, score: r.score, annual_kwh: Math.round(s.totalKwh), annual_cost_hkd: Math.round(s.totalCost), similar_homes_kwh: Math.round(r.peer), vs_similar_pct: +r.vsPeerPct.toFixed(1), by_end_use_kwh: Object.fromEntries(Object.entries(s.byEndUse).map(([k, v]) => [k, Math.round(v)])), appliances: s.rows.map((x) => ({ name: x.item.name, annual_cost_hkd: Math.round(x.cost) })) }}
           />
+          </div>
         </div>
       </div>
     </>

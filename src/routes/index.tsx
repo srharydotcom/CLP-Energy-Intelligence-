@@ -25,7 +25,7 @@ function Landing() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <div className="relative z-[1] min-h-screen font-sans">
       <header className="mx-auto flex max-w-6xl items-center justify-between p-5">
         <div className="flex items-center gap-2">
           <span className="grid size-8 place-items-center rounded bg-primary font-mono text-xs font-bold text-primary-foreground">CLP</span>

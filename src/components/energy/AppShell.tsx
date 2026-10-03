@@ -59,7 +59,7 @@ function Shell({ children }: { children: ReactNode }) {
   );
 
   return (
-    <div className="relative flex min-h-screen bg-background font-sans">
+    <div className="relative flex min-h-screen font-sans">
       <div aria-hidden className="ambient pointer-events-none fixed inset-0 z-0" />
       <aside className="sticky top-0 z-10 hidden h-screen w-60 shrink-0 flex-col border-r border-border/60 bg-sidebar/70 p-4 backdrop-blur-xl md:flex">
         <div className="mb-6 px-2">

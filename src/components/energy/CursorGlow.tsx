@@ -19,7 +19,9 @@ export function CursorGlow() {
       if (frame) return;
       frame = requestAnimationFrame(() => {
         light.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
-        light.style.opacity = "1";
+        const target = document.elementFromPoint(x, y) as HTMLElement | null;
+        const overContent = target?.closest("button, a, input, select, textarea, [role='button'], [role='dialog'], .bg-card, .bg-popover, .passport-spread, .passport-page, .passport-analysis, table, img, svg, h1, h2, h3, h4, p") ?? null;
+        light.style.opacity = overContent ? "0" : "1";
         frame = 0;
       });
     };
