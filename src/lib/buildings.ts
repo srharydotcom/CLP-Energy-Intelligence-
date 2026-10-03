@@ -75,11 +75,11 @@ export function baseline(arch: Archetype, x: BuildingInputs, s: Sens = BASE_SENS
   const base = x.areaM2 * Number(arch.kwh_per_m2);
   const w = WEATHER[x.weather];
   const raw: Record<string, number> = {
-    hvac: base * (share.hvac ?? 0) * hoursF * w.cooling,
-    lighting: base * (share.lighting ?? 0) * hoursF,
-    water_heating: base * (share.water_heating ?? 0) * occF,
-    refrigeration: base * (share.refrigeration ?? 0),
-    other: base * (share.other ?? 0) * (0.5 + 0.5 * hoursF) * (0.7 + 0.3 * occF),
+    hvac: base * (share["hvac"] ?? 0) * hoursF * w.cooling,
+    lighting: base * (share["lighting"] ?? 0) * hoursF,
+    water_heating: base * (share["water_heating"] ?? 0) * occF,
+    refrigeration: base * (share["refrigeration"] ?? 0),
+    other: base * (share["other"] ?? 0) * (0.5 + 0.5 * hoursF) * (0.7 + 0.3 * occF),
   };
   const modelled = Object.values(raw).reduce((p, q) => p + q, 0);
   const k = x.annualKwhOverride && modelled > 0 ? x.annualKwhOverride / modelled : 1;

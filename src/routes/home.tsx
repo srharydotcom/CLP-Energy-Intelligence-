@@ -117,7 +117,7 @@ function MyHomePage() {
           </div>
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Electricity plan</Label>
-            <Select value={tariff?.id} onValueChange={(v) => setProfile({ tariffId: v })}>
+            <Select value={tariff?.id ?? ""} onValueChange={(v) => setProfile({ tariffId: v })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>{residential.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
             </Select>
@@ -266,7 +266,7 @@ function MiscDialog({ onAdd }: { onAdd: (x: Omit<OwnedAppliance, "uid">) => void
           <Button
             disabled={!f.name.trim()}
             onClick={() => {
-              onAdd({ catalogId: null, name: f.name.trim(), category: "Other", endUse: "other", ...f });
+              onAdd({ catalogId: null, category: "Other", endUse: "other", ...f, name: f.name.trim() });
               setF({ name: "", watts: 100, standbyWatts: 0, hoursPerDay: 2, daysPerYear: 365, quantity: 1 });
               setOpen(false);
             }}
