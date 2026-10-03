@@ -40,26 +40,6 @@ function Landing() {
           <p className="mt-4 text-lg text-muted-foreground">Save your home and appliances, get an A–E rating, and see whether a new air-con, fridge or car pays for itself. Businesses get full investment and contract analysis.</p>
           <div className="mt-8 flex gap-3"><Button asChild size="lg"><Link to="/auth">Get started — it's free</Link></Button></div>
         </div>
-        <div className="mt-12 border-y border-border py-7">
-          <div className="grid items-center gap-5 sm:grid-cols-[auto_1fr]">
-            <div className="passport-cover passport-preview relative w-36 overflow-hidden" aria-hidden="true">
-              <div className="passport-spine" />
-              <div className="passport-cover-inner">
-                <div className="font-mono text-[8px] uppercase text-primary">CLP · Hong Kong</div>
-                <div className="passport-cover-center">
-                  <div className="passport-seal"><span>CLP</span><span>ENERGY</span></div>
-                  <div className="mt-3 font-display text-lg font-semibold leading-tight">Energy<br />Passport</div>
-                </div>
-                <div className="font-mono text-[8px] uppercase text-primary">Residential / HK</div>
-              </div>
-            </div>
-            <div>
-              <div className="font-mono text-[10px] uppercase text-primary">Your home · Your record</div>
-              <div className="mt-2 font-display text-xl font-semibold">A passport for your home’s energy.</div>
-              <p className="mt-2 max-w-md text-sm text-muted-foreground">Add your home and appliances to see your own rating, yearly costs and the numbers behind them.</p>
-            </div>
-          </div>
-        </div>
         <div className="mt-16 grid gap-8 md:grid-cols-2">
           <Column title="For your home" items={[
             [House, "My Home", "Your house and every appliance, saved to your account."],
