@@ -201,9 +201,9 @@
     text-transform: uppercase;
     letter-spacing: 0.15em;
   }
-  .passport-leaf .text-muted-foreground { color: var(--passport-muted); }
-  .passport-leaf .text-primary { color: var(--passport-ink); }
-  .passport-leaf .text-foreground { color: var(--passport-ink); }
+  .passport-leaf .text-muted-foreground { color: var(--passport-muted) !important; }
+  .passport-leaf .text-primary { color: var(--passport-ink) !important; }
+  .passport-leaf .text-foreground { color: var(--passport-ink) !important; }
   .passport-leaf .border-b, .passport-leaf .border-l, .passport-leaf .border-t { border-color: var(--passport-rule); }
   .passport-leaf > .passport-leaf-body > .bg-card { padding: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important; backdrop-filter: none !important; color: var(--passport-ink); }
   .passport-leaf .border-dashed, .passport-leaf .rounded-md.border { border-color: var(--passport-rule) !important; }
@@ -218,9 +218,9 @@
     box-shadow: inset 0 0 0 10px var(--passport-cover), inset 0 0 0 11px color-mix(in oklab, var(--primary) 45%, transparent), 0 18px 40px -24px oklch(0 0 0 / 0.7);
   }
   .passport-leaf--cover::before { display: none; }
-  .passport-leaf--cover .text-primary { color: var(--primary); }
-  .passport-leaf--cover .text-muted-foreground { color: var(--muted-foreground); }
-  .passport-leaf--cover .text-foreground { color: var(--foreground); }
+  .passport-leaf--cover .text-primary { color: var(--primary) !important; }
+  .passport-leaf--cover .text-muted-foreground { color: var(--muted-foreground) !important; }
+  .passport-leaf--cover .text-foreground { color: var(--foreground) !important; }
   .passport-leaf--cover .passport-leaf-footer { color: var(--muted-foreground); border-color: color-mix(in oklab, var(--primary) 30%, transparent); }
 
   .passport-seal {
