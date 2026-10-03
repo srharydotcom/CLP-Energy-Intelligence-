@@ -19,7 +19,7 @@ function Shell({ label, children, tone = "default", footer }: { label: string; c
   );
 }
 
-const Big = ({ children }: { children: ReactNode }) => <div className="font-display text-3xl font-semibold tabular-nums tracking-tight">{children}</div>;
+const Big = ({ children }: { children: ReactNode }) => <div className="font-display text-2xl font-semibold tabular-nums tracking-tight truncate">{children}</div>;
 
 export function EnergyCostCard({ annualCost, annualKwh, rate }: { annualCost: number; annualKwh: number; rate: number }) {
   return (
