@@ -69,12 +69,13 @@ function PassportPage() {
   return (
     <>
       {header}
-      <div className="passport-pages space-y-5">
+      <div className="passport-book">
         <EnergyPassportCard code={p.name.slice(0, 12).toUpperCase()} name={p.name} sub={`${p.district || "Hong Kong"} · ${num(u.show(p.areaM2))} ${u.label} · ${p.occupants} people`} m={m} />
 
-        <div className="passport-four-sections">
-          <section className="passport-page">
+        <div className="passport-spread">
+          <section className="passport-leaf">
             <div className="passport-page-heading"><span>03 / Method</span><span>Energy passport</span></div>
+            <div className="passport-leaf-body">
             <h2 className="mb-5 font-display text-xl font-semibold">How we worked this out</h2>
             <ol className="space-y-3 text-sm">
               <Step n={1} title="Add up your appliances">
@@ -94,12 +95,15 @@ function PassportPage() {
               </Step>
             </ol>
             <p className="mt-3 text-xs text-muted-foreground">The “similar homes” figures are demo numbers, not official statistics.</p>
+            </div>
+            <div className="passport-leaf-footer"><span>How it's calculated</span><span>03</span></div>
           </section>
 
-          <section className="passport-page">
+          <section className="passport-leaf">
             <div className="passport-page-heading"><span>04 / Usage</span><span>Energy passport</span></div>
+            <div className="passport-leaf-body flex flex-col">
             <div className="mb-5 font-display text-xl font-semibold">Estimated use by month <span className="font-mono text-xs font-normal text-muted-foreground">· kWh</span></div>
-            <div className="h-64">
+            <div className="min-h-64 flex-1">
               <ResponsiveContainer>
                 <BarChart data={months}>
                   <CartesianGrid vertical={false} stroke="var(--passport-rule)" />
@@ -110,14 +114,20 @@ function PassportPage() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
+            </div>
+            <div className="passport-leaf-footer"><span>Monthly estimate</span><span>04</span></div>
           </section>
-          <section className="passport-page">
+        </div>
+
+        <div className="passport-spread">
+          <section className="passport-leaf">
           <div className="passport-page-heading"><span>05 / Inventory</span><span>Energy passport</span></div>
+          <div className="passport-leaf-body">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="font-display text-xl font-semibold">Appliances in this home</h2>
             <Button asChild size="sm" variant="outline"><Link to="/home">Edit appliances</Link></Button>
           </div>
-          <div className="overflow-x-auto"><table className="min-w-[670px] w-full text-sm">
+          <div className="overflow-x-auto"><table className="min-w-[560px] w-full text-sm">
             <thead className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
               <tr className="border-b text-left"><th className="py-2">Appliance</th><th>Used for</th><th className="text-right">Working out</th><th className="text-right">kWh/yr</th><th className="text-right">Cost/yr</th></tr>
             </thead>
@@ -133,15 +143,20 @@ function PassportPage() {
               ))}
             </tbody>
           </table></div>
+          </div>
+          <div className="passport-leaf-footer"><span>Appliance inventory</span><span>05</span></div>
           </section>
 
-          <section className="passport-page passport-analysis">
+          <section className="passport-leaf">
           <div className="passport-page-heading"><span>06 / Findings</span><span>Energy passport</span></div>
+          <div className="passport-leaf-body">
           <AIAnalysisPanel
             module="passport"
             subjectId={active.id}
             metrics={{ home: p, grade: r.grade, score: r.score, annual_kwh: Math.round(s.totalKwh), annual_cost_hkd: Math.round(s.totalCost), similar_homes_kwh: Math.round(r.peer), vs_similar_pct: +r.vsPeerPct.toFixed(1), by_end_use_kwh: Object.fromEntries(Object.entries(s.byEndUse).map(([k, v]) => [k, Math.round(v)])), appliances: s.rows.map((x) => ({ name: x.item.name, annual_cost_hkd: Math.round(x.cost) })) }}
           />
+          </div>
+          <div className="passport-leaf-footer"><span>Findings & advice</span><span>06</span></div>
           </section>
         </div>
       </div>
