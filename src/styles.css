@@ -277,8 +277,8 @@
 
 /* Wide enough for two pages: join them into an open booklet with a stitched fold. */
 @container (min-width: 920px) {
-  .pp-spread { gap: 0; width: auto; filter: drop-shadow(0 30px 40px oklch(0 0 0 / 0.45)); }
-  .pp-spread > .pp-page { box-shadow: none; }
+  .pp-spread { gap: 0; width: calc(var(--pp-w) * 2); filter: drop-shadow(0 30px 40px oklch(0 0 0 / 0.45)); }
+  .pp-spread > .pp-page { width: var(--pp-w); box-shadow: none; }
   .pp-spread > .pp-page:first-child { border-radius: 14px 3px 3px 14px; border-right: 0; background-color: var(--passport-paper); }
   .pp-spread > .pp-page:last-child { border-radius: 3px 14px 14px 3px; }
   .pp-spread > .pp-page:not(.pp-cover):first-child { box-shadow: inset -26px 0 26px -24px oklch(0 0 0 / 0.45); }
