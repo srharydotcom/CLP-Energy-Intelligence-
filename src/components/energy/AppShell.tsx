@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Gauge, IdCard, ShoppingCart, Building2, GitBranch } from "lucide-react";
+import { Gauge, IdCard, ShoppingCart, Building2, GitBranch, House, Factory } from "lucide-react";
 
 const NAV = [
   { to: "/", label: "Overview", icon: Gauge },
+  { to: "/home", label: "My Home", icon: House },
   { to: "/passport", label: "Energy Passport", icon: IdCard },
   { to: "/buy", label: "Should I Buy This?", icon: ShoppingCart },
+  { to: "/buildings", label: "Building Investments", icon: Factory },
   { to: "/procurement", label: "Business Procurement", icon: Building2 },
   { to: "/scenarios", label: "Scenario Analysis", icon: GitBranch },
 ] as const;
