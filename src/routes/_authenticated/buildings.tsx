@@ -1,7 +1,8 @@
 import { useAreaUnit } from "@/lib/units";
+import { AreaUnitToggle } from "@/components/energy/AreaUnitToggle";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Plus, Trash2, CheckCircle2, XCircle } from "lucide-react";
 import { PageHeader } from "@/components/energy/AppShell";
 import { AssumptionPanel } from "@/components/energy/AssumptionPanel";
@@ -31,10 +32,10 @@ export const Route = createFileRoute("/_authenticated/buildings")({
   component: BuildingsPage,
 });
 
-function F({ label, value, onChange, step = 1, suffix, placeholder }: { label: string; value: number | null; onChange: (n: number | null) => void; step?: number | undefined; suffix?: string | undefined; placeholder?: string }) {
+function F({ label, value, onChange, step = 1, suffix, placeholder, extra }: { label: string; value: number | null; onChange: (n: number | null) => void; step?: number | undefined; suffix?: string | undefined; placeholder?: string; extra?: ReactNode }) {
   return (
     <div className="space-y-1">
-      <Label className="text-xs text-muted-foreground">{label}{suffix && <span className="ml-1 font-mono">({suffix})</span>}</Label>
+      <Label className="text-xs text-muted-foreground">{label}{suffix && <span className="ml-1 font-mono">({suffix})</span>}{extra}</Label>
       <Input type="number" step={step} min={0} placeholder={placeholder} value={value ?? ""} onChange={(e) => onChange(e.target.value === "" ? null : Math.max(0, Number(e.target.value)))} />
     </div>
   );
@@ -103,7 +104,7 @@ function BuildingsPage() {
           <p className="mb-4 text-sm text-muted-foreground">Enter your own figures. Grey hints show what is typical for this type of building.</p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {BASICS.map((f) => (
-              <F key={f.key} label={f.label} suffix={isArea(f.key) ? u.label : f.suffix} step={f.step} placeholder={`typical ${typical[f.key]}`} value={isArea(f.key) && basics[f.key] != null ? u.show(basics[f.key]!) : basics[f.key]} onChange={(n) => setBasics({ ...basics, [f.key]: isArea(f.key) && n != null ? u.toM2(n) : n })} />
+              <F key={f.key} label={f.label} suffix={isArea(f.key) ? u.label : f.suffix} extra={isArea(f.key) ? <AreaUnitToggle /> : undefined} step={f.step} placeholder={`typical ${typical[f.key]}`} value={isArea(f.key) && basics[f.key] != null ? u.show(basics[f.key]!) : basics[f.key]} onChange={(n) => setBasics({ ...basics, [f.key]: isArea(f.key) && n != null ? u.toM2(n) : n })} />
             ))}
           </div>
           <Button className="mt-5" disabled={!basicsReady} onClick={start}>Evaluate investments</Button>
@@ -136,7 +137,7 @@ function BuildingsPage() {
         <section className="rounded-lg border bg-card p-4">
           <h2 className="mb-3 font-display text-base font-semibold">Building</h2>
           <div className="grid grid-cols-2 gap-3">
-            <F label="Floor area" suffix={u.label} step={500} value={u.show(x.areaM2)} onChange={req((n) => set({ areaM2: u.toM2(n) }))} />
+            <F label="Floor area" suffix={u.label} extra={<AreaUnitToggle />} step={500} value={u.show(x.areaM2)} onChange={req((n) => set({ areaM2: u.toM2(n) }))} />
             <F label="Annual use" suffix="kWh" step={10000} placeholder={`est. ${num(b.kwh)}`} value={x.annualKwhOverride} onChange={(n) => set({ annualKwhOverride: n || null })} />
             <F label="Operating hours/day" step={0.5} value={x.hoursPerDay} onChange={req((n) => set({ hoursPerDay: Math.min(24, n) }))} />
             <F label="Days/week" value={x.daysPerWeek} onChange={req((n) => set({ daysPerWeek: Math.min(7, n) }))} />
@@ -165,7 +166,7 @@ function BuildingsPage() {
             <F label="Capital budget" suffix="HK$" step={500000} value={x.budget} onChange={req((n) => set({ budget: n }))} />
             <F label="Max payback" suffix="years" step={0.5} value={x.maxPaybackYears} onChange={req((n) => set({ maxPaybackYears: n }))} />
             <F label="Max install disruption" suffix="weeks" value={x.maxInstallWeeks} onChange={req((n) => set({ maxInstallWeeks: n }))} />
-            <F label="Usable roof" suffix={u.label} step={100} value={u.show(x.roofAreaM2)} onChange={req((n) => set({ roofAreaM2: u.toM2(n) }))} />
+            <F label="Usable roof" suffix={u.label} extra={<AreaUnitToggle />} step={100} value={u.show(x.roofAreaM2)} onChange={req((n) => set({ roofAreaM2: u.toM2(n) }))} />
           </div>
         </section>
       </div>

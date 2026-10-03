@@ -49,17 +49,37 @@ function HouseholdDashboard({ name }: { name: string | null }) {
         right={<Button onClick={() => create.mutate({ name: `Home ${homes.length + 1}` })} disabled={create.isPending}><Plus className="size-4" /> Add a home</Button>} />
 
       {homes.length > 0 && (
-        <div className="mb-6 grid gap-4 sm:grid-cols-3">
+        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <div className="relative overflow-hidden rounded-2xl border bg-card p-6 md:col-span-2 md:row-span-2">
+            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+              <span className="size-1.5 animate-pulse rounded-full bg-positive" /> Electricity, all homes
+            </div>
+            <div className="mt-6 font-mono text-5xl font-semibold tracking-tighter tabular-nums">{hkd(total)}</div>
+            <div className="mt-1 text-sm text-muted-foreground">estimated per year</div>
+            <div className="mt-8 grid grid-cols-3 gap-2">
+              {rows.slice(0, 3).map(({ h, r }) => (
+                <div key={h.id} className="rounded-xl border border-border/60 p-3">
+                  <div className="truncate text-xs text-muted-foreground">{h.profile.name}</div>
+                  <div className="mt-1 font-mono text-sm tabular-nums">{r ? hkd(r.summary.totalCost) : "—"}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div aria-hidden className="relative hidden min-h-40 overflow-hidden rounded-2xl border bg-card md:col-span-1 md:row-span-2 md:block lg:col-span-2">
+            <div className="ambient pointer-events-none absolute inset-0 z-0 opacity-90" />
+            <div className="pointer-events-none absolute -right-10 -top-10 z-0 size-56 animate-pulse rounded-full bg-primary/15 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-12 left-6 z-0 size-48 rounded-full bg-chart-2/20 blur-3xl" />
+            <div className="absolute bottom-4 left-5 z-[1] font-mono text-[10px] uppercase tracking-widest text-muted-foreground">CLP · Energy Intelligence</div>
+          </div>
           <Tile label="Homes saved" value={String(homes.length)} />
           <Tile label="Appliances tracked" value={String(homes.reduce((s, h) => s + h.appliances.length, 0))} />
-          <Tile label="Electricity, all homes" value={`${hkd(total)}/yr`} />
         </div>
       )}
 
       <div data-tour="dashboard-homes" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {isLoading && <Skeleton className="h-40" />}
         {rows.map(({ h, r }) => (
-          <div key={h.id} className="group relative rounded-lg border bg-card p-4 transition-colors hover:border-primary/50">
+          <div key={h.id} className="tactile group relative rounded-2xl border bg-card p-4 hover:border-primary/50">
             <Link to="/home" onClick={() => setActiveId(h.id)} className="block">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -83,7 +103,7 @@ function HouseholdDashboard({ name }: { name: string | null }) {
           </div>
         ))}
         {!isLoading && (
-          <button onClick={() => create.mutate({ name: `Home ${homes.length + 1}` })} className="grid min-h-40 place-items-center rounded-lg border border-dashed p-4 text-sm text-muted-foreground hover:border-primary/50 hover:text-foreground">
+          <button onClick={() => create.mutate({ name: `Home ${homes.length + 1}` })} className="tactile grid min-h-40 place-items-center rounded-2xl border border-dashed p-4 text-sm text-muted-foreground hover:border-primary/50 hover:text-foreground">
             <span className="flex items-center gap-2"><Plus className="size-4" /> {homes.length ? "Add another home" : "Add your first home"}</span>
           </button>
         )}
@@ -107,9 +127,9 @@ function HouseholdDashboard({ name }: { name: string | null }) {
 
 function Tile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border bg-card p-4">
+    <div className="rounded-2xl border bg-card p-4">
       <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">{label}</div>
-      <div className="mt-1 font-display text-2xl font-semibold tabular-nums">{value}</div>
+      <div className="mt-1 font-mono text-2xl font-semibold tracking-tight tabular-nums">{value}</div>
     </div>
   );
 }

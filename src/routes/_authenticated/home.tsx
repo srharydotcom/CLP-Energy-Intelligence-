@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Plus, Trash2, PackagePlus, Sparkles, ChevronDown } from "lucide-react";
 import { useAreaUnit } from "@/lib/units";
+import { AreaUnitToggle } from "@/components/energy/AreaUnitToggle";
 import { PageHeader } from "@/components/energy/AppShell";
 import { EnergyCostCard } from "@/components/energy/MetricCards";
 import { AssumptionPanel } from "@/components/energy/AssumptionPanel";
@@ -35,10 +36,10 @@ export const Route = createFileRoute("/_authenticated/home")({
 
 const MISC_CATEGORIES = ["Kitchen", "Electronics", "Personal care", "Garden & outdoor", "Hobby & tools", "Health", "Pets & aquarium", "Other"];
 
-function NumField({ label, value, onChange, step = 1, suffix }: { label: string; value: number; onChange: (n: number) => void; step?: number; suffix?: string }) {
+function NumField({ label, value, onChange, step = 1, suffix, extra }: { label: string; value: number; onChange: (n: number) => void; step?: number; suffix?: string; extra?: ReactNode }) {
   return (
     <div className="space-y-1">
-      <Label className="text-xs text-muted-foreground">{label}{suffix && <span className="ml-1 font-mono">({suffix})</span>}</Label>
+      <Label className="text-xs text-muted-foreground">{label}{suffix && <span className="ml-1 font-mono">({suffix})</span>}{extra}</Label>
       <Input type="number" step={step} min={0} value={Number.isFinite(value) ? value : 0} onChange={(e) => onChange(Math.max(0, Number(e.target.value)))} />
     </div>
   );
@@ -134,7 +135,7 @@ function HomeEditor({ home, update }: { home: SavedHome; update: (fn: (h: SavedH
               <div className="space-y-1"><Label className="text-xs text-muted-foreground">Name</Label><Input value={p.name} onChange={(e) => setProfile({ name: e.target.value })} /></div>
               <div className="space-y-1"><Label className="text-xs text-muted-foreground">District</Label><Input value={p.district} placeholder="e.g. Sha Tin" onChange={(e) => setProfile({ district: e.target.value })} /></div>
               <Choice label="Type of home" value={p.propertyType} onChange={(v) => setProfile({ propertyType: v })} options={[["flat", "Flat / apartment"], ["house", "House"], ["village", "Village house"]]} />
-              <NumField label="Size" suffix={u.label} value={u.show(p.areaM2)} onChange={(n) => setProfile({ areaM2: u.toM2(n) })} />
+              <NumField label="Size" suffix={u.label} extra={<AreaUnitToggle />} value={u.show(p.areaM2)} onChange={(n) => setProfile({ areaM2: u.toM2(n) })} />
               <NumField label="People living here" value={p.occupants} onChange={(n) => setProfile({ occupants: Math.round(n) })} />
               <NumField label="Bedrooms" value={p.bedrooms} onChange={(n) => setProfile({ bedrooms: Math.round(n) })} />
             </div>
