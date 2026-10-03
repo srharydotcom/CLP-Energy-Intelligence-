@@ -310,7 +310,7 @@
 }
 
 @media (min-width: 900px) {
-  .passport-four-sections { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(390px, auto); }
+  .passport-four-sections { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(390px, 1fr); }
 }
 
 @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {

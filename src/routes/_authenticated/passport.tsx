@@ -111,7 +111,7 @@ function PassportPage() {
               </ResponsiveContainer>
             </div>
           </section>
-        <section className="passport-page p-5 sm:p-6">
+          <section className="passport-page p-5 sm:p-6">
           <div className="passport-page-heading"><span>05 / Inventory</span><span>Energy passport</span></div>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="font-display text-xl font-semibold">Appliances in this home</h2>
@@ -133,16 +133,16 @@ function PassportPage() {
               ))}
             </tbody>
           </table></div>
-        </section>
+          </section>
 
-        <div className="passport-analysis">
+          <div className="passport-analysis">
           <div className="passport-page-heading"><span>06 / Findings</span><span>Energy passport</span></div>
           <AIAnalysisPanel
             module="passport"
             subjectId={active.id}
             metrics={{ home: p, grade: r.grade, score: r.score, annual_kwh: Math.round(s.totalKwh), annual_cost_hkd: Math.round(s.totalCost), similar_homes_kwh: Math.round(r.peer), vs_similar_pct: +r.vsPeerPct.toFixed(1), by_end_use_kwh: Object.fromEntries(Object.entries(s.byEndUse).map(([k, v]) => [k, Math.round(v)])), appliances: s.rows.map((x) => ({ name: x.item.name, annual_cost_hkd: Math.round(x.cost) })) }}
           />
-        </div>
+          </div>
         </div>
       </div>
     </>
