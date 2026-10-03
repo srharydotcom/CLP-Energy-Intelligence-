@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Style Energy Passport as a document without changing calculations or controls
+- [ ] Add contextual, cursor-following yellow light across screens
+
 - [x] Home appliances: two-level dropdown (category → appliance)
 - [x] Home appliances: recommend better options for my requirements
 - [x] Should I Buy: more categories incl. "Something else"; "add your own" in every category
