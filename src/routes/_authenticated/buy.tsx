@@ -96,6 +96,37 @@ function AddProductDialog({ category, onAdd }: { category: string; onAdd: (p: Pr
   );
 }
 
+type ReqKey = "roomM2" | "acHoursPerDay" | "occupants" | "evKmPerYear" | "areaM2" | "screenIn" | "tvHours" | "loadsPerWeek" | "minKg" | "mealsPerDay" | "hoursPerDay" | "budget";
+type ReqField = { key: ReqKey; label: string; hint: string; optional?: boolean; step?: number };
+const BUDGET: ReqField = { key: "budget", label: "Most you'd spend (HK$)", hint: "Leave empty for no limit", optional: true, step: 500 };
+/** What we need to know before recommending, per type. Each answer changes the result. */
+const REQUIREMENTS: Record<string, ReqField[]> = {
+  "Air conditioner": [
+    { key: "roomM2", label: "Size of the room to cool (m²)", hint: "Sets the cooling power you need" },
+    { key: "acHoursPerDay", label: "Hours it runs a day in summer", hint: "Drives the yearly running cost" }, BUDGET],
+  Refrigerator: [{ key: "occupants", label: "People it feeds", hint: "Sets the fridge size you need" }, BUDGET],
+  "Water heater": [{ key: "occupants", label: "People showering daily", hint: "Sets tank size and hot-water use" }, BUDGET],
+  EV: [{ key: "evKmPerYear", label: "Kilometres you drive a year", hint: "Drives charging cost", step: 500 }, BUDGET],
+  "Home battery": [{ ...BUDGET, optional: false, hint: "Batteries vary hugely in price" }],
+  TV: [
+    { key: "screenIn", label: "Smallest screen you'd accept (inches)", hint: "Hides smaller TVs" },
+    { key: "tvHours", label: "Hours of TV a day", hint: "Drives running cost" }, BUDGET],
+  "Washing machine": [
+    { key: "loadsPerWeek", label: "Loads per week", hint: "Drives running cost" },
+    { key: "minKg", label: "Smallest drum you'd accept (kg)", hint: "Hides smaller machines", optional: true }, BUDGET],
+  Dryer: [{ key: "loadsPerWeek", label: "Loads dried per week", hint: "Drives running cost" }, BUDGET],
+  Dishwasher: [{ key: "loadsPerWeek", label: "Cycles per week", hint: "Drives running cost" }, BUDGET],
+  Dehumidifier: [{ key: "areaM2", label: "Area to keep dry (m²)", hint: "Drives how hard it works" }, BUDGET],
+  Cooktop: [{ key: "mealsPerDay", label: "Cooked meals a day", hint: "Drives running cost" }, BUDGET],
+  Lighting: [{ key: "areaM2", label: "Area to light (m²)", hint: "Sets how many bulbs you need" }, BUDGET],
+  Other: [{ key: "hoursPerDay", label: "Hours it's on a day", hint: "Drives running cost" }, BUDGET],
+};
+const REF_USE: Partial<Record<string, { key: ReqKey; ref: number }>> = {
+  TV: { key: "tvHours", ref: 5 }, "Washing machine": { key: "loadsPerWeek", ref: 4 }, Dryer: { key: "loadsPerWeek", ref: 3 },
+  Dishwasher: { key: "loadsPerWeek", ref: 5 }, Cooktop: { key: "mealsPerDay", ref: 2 }, Other: { key: "hoursPerDay", ref: 4 },
+};
+const MIN_SIZE: Partial<Record<string, ReqKey>> = { TV: "screenIn", "Washing machine": "minKg" };
+
 function BuyPage() {
   const products = useQuery(productsQuery);
   const tariffs = useQuery(tariffsQuery);
@@ -105,41 +136,56 @@ function BuyPage() {
   const [a, setA] = useState(DEFAULT_ASSUMPTIONS);
   const [homeId, setHomeId] = useState("");
   const [tariffId, setTariffId] = useState<string>();
-  const [ctx, setCtx] = useState<HouseholdContext>({ areaM2: 0, roomM2: 0, occupants: 0, acHoursPerDay: 0, evKmPerYear: 0 });
+  const [req, setReq] = useState<Partial<Record<ReqKey, number>>>({});
+  const [submitted, setSubmitted] = useState(false);
 
   const myHomes = useHomes();
   useEffect(() => {
     if (myHomes.active && !homeId) setHomeId(`mine:${myHomes.active.id}`);
   }, [myHomes.active, homeId]);
   const mine = homeId.startsWith("mine:") ? myHomes.homes.find((h) => `mine:${h.id}` === homeId) : undefined;
-  useEffect(() => {
-    if (mine) {
-      setCtx((c) => ({ ...homeContext(mine.profile), evKmPerYear: mine.profile.evKmPerYear || c.evKmPerYear }));
-      setTariffId(mine.profile.tariffId);
-    }
-  }, [mine]);
+  useEffect(() => { if (mine) setTariffId(mine.profile.tariffId); }, [mine]);
+
+  const fields = REQUIREMENTS[category ?? ""] ?? REQUIREMENTS["Other"]!;
+  const ready = fields.every((f) => f.optional || (req[f.key] ?? 0) > 0);
+  const ctx: HouseholdContext = useMemo(() => {
+    const ref = category ? REF_USE[category] : undefined;
+    return {
+      coolingFactor: mine ? homeContext(mine.profile).coolingFactor : 1,
+      areaM2: req.areaM2 ?? 0, roomM2: req.roomM2 ?? 0, occupants: req.occupants ?? 0,
+      acHoursPerDay: req.acHoursPerDay ?? 0, evKmPerYear: req.evKmPerYear ?? 0,
+      ratioOverride: ref ? (req[ref.key] ?? 0) / ref.ref : undefined,
+    };
+  }, [req, category, mine]);
 
   const tariff = tariffs.data?.find((t) => t.id === (tariffId ?? "res-std"));
   const all = [...(products.data ?? []), ...custom];
   const categories = [...new Set(all.map((p) => p.category))];
+  const inCat = all.filter((p) => p.category === category);
 
-  const rows = useMemo(
-    () => (tariff ? all.filter((p) => p.category === category).map((p) => contextEconomics(p, tariff, a, ctx)) : []),
+  const rows = useMemo(() => {
+    if (!tariff || !submitted) return [];
+    const minKey = category ? MIN_SIZE[category] : undefined;
+    return inCat
+      .filter((p) => !req.budget || Number(p.price) <= req.budget)
+      .filter((p) => !minKey || !req[minKey] || p.capacity == null || Number(p.capacity) >= req[minKey]!)
+      .map((p) => contextEconomics(p, tariff, a, ctx));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [products.data, custom, tariff, category, a, ctx],
-  );
+  }, [products.data, custom, tariff, category, a, ctx, submitted]);
   const usable = rows.filter((r) => r.fit !== "undersized");
   const pool = usable.length ? usable : rows;
   const best = pool.reduce<(typeof rows)[number] | undefined>((b, r) => (!b || r.horizonTco < b.horizonTco ? r : b), undefined);
   const baseline = rows.reduce<(typeof rows)[number] | undefined>((b, r) => (b && Number(b.product.price) <= Number(r.product.price) ? b : r), undefined);
   const cand = rows.find((r) => r.product.id === selected) ?? best;
 
+  const pick = (c: string) => { setCategory(c); setSelected(undefined); setReq({}); setSubmitted(false); };
+  const catList = [...categories, ...(categories.includes("Other") ? [] : ["Other"])];
   const tabs = (
-    <Tabs value={category ?? ""} onValueChange={(c) => { setCategory(c); setSelected(undefined); }}>
-      <TabsList className="h-auto flex-wrap">{[...categories, ...(categories.includes("Other") ? [] : ["Other"])].map((c) => <TabsTrigger key={c} value={c}>{c === "Other" ? "Something else" : c}</TabsTrigger>)}</TabsList>
+    <Tabs value={category ?? ""} onValueChange={pick}>
+      <TabsList className="h-auto flex-wrap">{catList.map((c) => <TabsTrigger key={c} value={c}>{c === "Other" ? "Something else" : c}</TabsTrigger>)}</TabsList>
     </Tabs>
   );
-  const header = <PageHeader kicker="Module 02" title="Should I Buy This?" sub="Cost a product in your own home — its size, your household and your tariff — and compare its total cost of ownership with the alternatives." />;
+  const header = <PageHeader kicker="Module 02" title="Should I Buy This?" sub="Tell us what you need and we'll work out which option costs you least to own." />;
   if (!tariff || products.isLoading || myHomes.isLoading) return <>{header}<Skeleton className="h-96" /></>;
   if (!homeIsComplete(mine)) return (
     <>{header}
@@ -154,24 +200,56 @@ function BuyPage() {
     <>{header}
       <div className="rounded-lg border bg-card p-6">
         <div className="mb-1 font-display text-lg font-semibold">What are you thinking of buying?</div>
-        <p className="mb-4 text-sm text-muted-foreground">Pick a type and we&apos;ll compare the options for {mine!.profile.name}.</p>
+        <p className="mb-4 text-sm text-muted-foreground">Pick a type to see what&apos;s new and popular.</p>
         <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-4">
-          {[...categories, ...(categories.includes("Other") ? [] : ["Other"])].map((c) => (
-            <Button key={c} variant="outline" className="h-12 justify-start" onClick={() => setCategory(c)}>{c === "Other" ? "Something else" : c}</Button>
+          {catList.map((c) => (
+            <Button key={c} variant="outline" className="h-12 justify-start" onClick={() => pick(c)}>{c === "Other" ? "Something else" : c}</Button>
           ))}
         </div>
       </div>
     </>
   );
-  if (!cand || !baseline || !best) return (
+  const addDialog = <AddProductDialog category={category} onAdd={(p) => { setCustom((c) => [...c, p]); setSelected(p.id); }} />;
+  const reqForm = (
+    <div className="mb-5 rounded-lg border bg-card p-4">
+      <div className="mb-3 font-display font-semibold">Your requirements</div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {fields.map((f) => (
+          <div key={f.key}>
+            <Label className="text-xs text-muted-foreground">{f.label}{f.optional ? " (optional)" : ""}</Label>
+            <Input type="number" min={0} step={f.step ?? 1} className="mt-1 h-9 font-mono" value={req[f.key] ?? ""} placeholder="—"
+              onChange={(e) => setReq({ ...req, [f.key]: e.target.value === "" ? undefined : Number(e.target.value) })} />
+            <div className="mt-1 text-[11px] text-muted-foreground">{f.hint}</div>
+          </div>
+        ))}
+      </div>
+      <Button className="mt-4" disabled={!ready} onClick={() => { setSubmitted(true); setSelected(undefined); }}>
+        {submitted ? "Update recommendation" : "Show my recommendation"}
+      </Button>
+      {!ready && <span className="ml-3 text-xs text-muted-foreground">Fill in the required fields first.</span>}
+    </div>
+  );
+  if (!submitted || !cand || !baseline || !best) return (
     <>{header}
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        {tabs}
-      </div>
-      <div className="rounded-lg border border-dashed p-10 text-center">
-        <p className="mb-4 text-muted-foreground">Nothing to compare here yet. Add the products you're choosing between — at least two.</p>
-        <AddProductDialog category={category} onAdd={(p) => { setCustom((c) => [...c, p]); setSelected(p.id); }} />
-      </div>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">{tabs}{addDialog}</div>
+      {reqForm}
+      {submitted && <div className="mb-5 rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">Nothing matches those requirements — try a higher budget or smaller minimum size, or add a model yourself.</div>}
+      <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">New &amp; popular · {category === "Other" ? "something else" : category.toLowerCase()}</div>
+      {inCat.length === 0 ? (
+        <p className="mt-2 text-sm text-muted-foreground">No models listed yet — add the ones you&apos;re choosing between.</p>
+      ) : (
+        <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {inCat.map((p) => (
+            <div key={p.id} className="rounded-lg border bg-card p-4">
+              <div className="font-display font-semibold">{p.brand} {p.model}</div>
+              <div className="mt-1 font-mono text-sm">{hkd(Number(p.price))}</div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {p.capacity != null && p.capacity_unit ? `${num(Number(p.capacity))} ${p.capacity_unit} · ` : ""}lasts ~{p.lifetime_years} yrs
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 
@@ -183,33 +261,17 @@ function BuyPage() {
   return (
     <>
       {header}
-      <div className="mb-5 grid gap-3 rounded-lg border bg-card p-4 sm:grid-cols-3 lg:grid-cols-6">
-        <div className="sm:col-span-1 lg:col-span-2">
-          <Label className="text-xs text-muted-foreground">Which home</Label>
-          <Select value={homeId} onValueChange={setHomeId}>
-            <SelectTrigger className="mt-1 h-9"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {myHomes.homes.map((h) => <SelectItem key={h.id} value={`mine:${h.id}`}>{h.profile.name}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        {category === "Air conditioner" ? (
-          <NumField label="Room to cool (m²)" value={ctx.roomM2} onChange={(n) => setCtx({ ...ctx, roomM2: n })} hint={`Home: ${num(ctx.areaM2)} m²`} />
-        ) : (
-          <NumField label="Home area (m²)" value={ctx.areaM2} onChange={(n) => setCtx({ ...ctx, areaM2: n })} />
-        )}
-        <NumField label="People at home" value={ctx.occupants} onChange={(n) => setCtx({ ...ctx, occupants: n })} />
-        {category === "EV" ? (
-          <NumField label="Driving (km/yr)" value={ctx.evKmPerYear} step={500} onChange={(n) => setCtx({ ...ctx, evKmPerYear: n })} />
-        ) : (
-          <NumField label="AC use (hours/day)" value={ctx.acHoursPerDay} onChange={(n) => setCtx({ ...ctx, acHoursPerDay: n })} />
-        )}
-      </div>
-
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         {tabs}
-        {<AddProductDialog category={category} onAdd={(p) => { setCustom((c) => [...c, p]); setSelected(p.id); }} />}
+        <div className="flex items-center gap-2">
+          <Select value={homeId} onValueChange={setHomeId}>
+            <SelectTrigger className="h-9 w-48"><SelectValue /></SelectTrigger>
+            <SelectContent>{myHomes.homes.map((h) => <SelectItem key={h.id} value={`mine:${h.id}`}>{h.profile.name}</SelectItem>)}</SelectContent>
+          </Select>
+          {addDialog}
+        </div>
       </div>
+      {reqForm}
 
       <div className="grid gap-5 lg:grid-cols-[1fr_300px]">
         <div className="space-y-5">
@@ -247,7 +309,7 @@ function BuyPage() {
             metrics={{
               category,
               tariff: tariff.name,
-              household: { passport: mine?.profile.name, ...ctx, window_facing: mine?.profile.windowFacing, owned_appliances: mine?.appliances.length },
+              household: { home: mine?.profile.name, requirements: req, owned_appliances: mine?.appliances.length },
               horizon_years: H,
               best_choice: best.product.id,
               candidate: { ...cand.product, size_fit: cand.fit, required_capacity: cand.required, usage_factor: cand.usageFactor, annual_kwh_in_home: cand.annualKwh, annual_cost: cand.annualCost, lifetime_cost_pv: cand.lifetimeCost, horizon_tco_pv: cand.horizonTco, lifetime_co2_kg: cand.lifetimeCo2Kg, shift_saving: cand.annualShiftSaving },
