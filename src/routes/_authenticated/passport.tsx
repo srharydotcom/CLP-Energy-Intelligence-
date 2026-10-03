@@ -69,12 +69,13 @@ function PassportPage() {
   return (
     <>
       {header}
-      <div className="space-y-5">
+      <div className="passport-pages space-y-5">
         <EnergyPassportCard code={p.name.slice(0, 12).toUpperCase()} name={p.name} sub={`${p.district || "Hong Kong"} · ${num(u.show(p.areaM2))} ${u.label} · ${p.occupants} people`} m={m} />
 
         <div className="grid gap-5 lg:grid-cols-2">
-          <section className="rounded-lg border bg-card p-4">
-            <h2 className="mb-3 font-display text-lg font-semibold">How we worked this out</h2>
+          <section className="passport-page p-5 sm:p-6">
+            <div className="passport-page-heading"><span>03 / Method</span><span>Energy passport</span></div>
+            <h2 className="mb-5 font-display text-xl font-semibold">How we worked this out</h2>
             <ol className="space-y-3 text-sm">
               <Step n={1} title="Add up your appliances">
                 Each appliance: watts × hours on per day × days per year, plus its standby power the rest of the time. All {active.appliances.length} together use <b>{num(s.totalKwh)} kWh</b> a year.
@@ -95,8 +96,9 @@ function PassportPage() {
             <p className="mt-3 text-xs text-muted-foreground">The “similar homes” figures are demo numbers, not official statistics.</p>
           </section>
 
-          <section className="rounded-lg border bg-card p-4">
-            <div className="mb-3 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Estimated use by month · kWh</div>
+          <section className="passport-page p-5 sm:p-6">
+            <div className="passport-page-heading"><span>04 / Usage</span><span>Energy passport</span></div>
+            <div className="mb-5 font-display text-xl font-semibold">Estimated use by month <span className="font-mono text-xs font-normal text-muted-foreground">· kWh</span></div>
             <div className="h-64">
               <ResponsiveContainer>
                 <BarChart data={months}>
@@ -111,12 +113,13 @@ function PassportPage() {
           </section>
         </div>
 
-        <section className="rounded-lg border bg-card p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="font-display text-lg font-semibold">Appliances in this home</h2>
+        <section className="passport-page p-5 sm:p-6">
+          <div className="passport-page-heading"><span>05 / Inventory</span><span>Energy passport</span></div>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="font-display text-xl font-semibold">Appliances in this home</h2>
             <Button asChild size="sm" variant="outline"><Link to="/home">Edit appliances</Link></Button>
           </div>
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="min-w-[670px] w-full text-sm">
             <thead className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
               <tr className="border-b text-left"><th className="py-2">Appliance</th><th>Used for</th><th className="text-right">Working out</th><th className="text-right">kWh/yr</th><th className="text-right">Cost/yr</th></tr>
             </thead>
@@ -131,7 +134,7 @@ function PassportPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </section>
 
         <AIAnalysisPanel

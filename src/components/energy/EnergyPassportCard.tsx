@@ -15,35 +15,57 @@ const gradeColor: Record<string, string> = {
 export function EnergyPassportCard({ code, name, sub, m }: { code: string; name: string; sub: string; m: PassportMetrics }) {
   const u = useAreaUnit();
   return (
-    <div className="rounded-lg border bg-card">
-      <div className="flex items-start justify-between border-b p-5">
-        <div>
-          <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Energy Passport · {code}</div>
-          <h2 className="mt-1 font-display text-xl font-semibold">{name}</h2>
-          <div className="text-sm text-muted-foreground">
-            {sub}
+    <article className="passport-cover relative overflow-hidden" aria-label={`Energy passport for ${name}`}>
+      <div className="passport-spine" aria-hidden="true" />
+      <div className="passport-cover-inner">
+        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-primary/25 pb-5">
+          <div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">CLP · Hong Kong</div>
+            <div className="mt-4 font-mono text-[11px] uppercase tracking-[0.15em] text-muted-foreground">Residential energy record</div>
+            <h2 className="mt-1 font-display text-3xl font-semibold leading-tight sm:text-4xl">Energy<br />Passport</h2>
+          </div>
+          <div className="passport-seal" aria-hidden="true"><span>CLP</span><span>ENERGY</span></div>
+        </div>
+        <div className="grid gap-6 py-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+          <div className="min-w-0">
+            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Registered home</div>
+            <div className="mt-1 break-words font-display text-xl font-medium">{name}</div>
+            <div className="mt-2 text-sm text-muted-foreground">{sub}</div>
+            <div className="mt-5 font-mono text-[10px] uppercase tracking-[0.15em] text-primary">Document no. · {code}</div>
+          </div>
+          <div className="flex items-center gap-5 sm:justify-end">
+            <div className="text-center">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Rating</div>
+              <div className={cn("passport-grade mt-2", gradeColor[m.grade])}>{m.grade}</div>
+            </div>
+            <div className="border-l border-primary/25 pl-5 text-center">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Score</div>
+              <div className="mt-2 font-display text-4xl font-semibold tabular-nums">{m.score}</div>
+              <div className="font-mono text-[10px] text-muted-foreground">/ 100</div>
+            </div>
           </div>
         </div>
-        <div className="text-right">
-          <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Score</div>
-          <div className="font-display text-4xl font-semibold tabular-nums">{m.score}</div>
+        <div className="border-t border-primary/25 pt-5">
+          <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Efficiency classification · A–E</div>
+          <div className="grid max-w-xl grid-cols-5 gap-1.5">
+            {GRADES.map((g) => (
+              <div key={g} className={cn("relative text-center", m.grade === g && "passport-active-grade")}>
+                <div className={cn("h-2 w-full", gradeColor[g], m.grade !== g && "opacity-45")} />
+                <div className={cn("mt-1 font-mono text-xs", m.grade === g ? "font-bold text-foreground" : "text-muted-foreground")}>{g}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-5 flex justify-between border-t border-primary/25 pt-3 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+          <span>Energy intelligence · HK</span><span>01 / Record</span>
         </div>
       </div>
-      <div className="grid gap-6 p-5 md:grid-cols-[220px_1fr]">
-        <div className="space-y-1.5">
-          {GRADES.map((g, i) => (
-            <div key={g} className="flex items-center gap-2">
-              <div
-                className={cn("flex h-7 items-center rounded-r-md pl-2 font-mono text-sm font-bold text-background", gradeColor[g], m.grade !== g && "opacity-30")}
-                style={{ width: `${45 + i * 12}%` }}
-              >
-                {g}
-              </div>
-              {m.grade === g && <span className="font-mono text-xs">◀ this home</span>}
-            </div>
-          ))}
+      <div className="passport-sheet">
+        <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2 border-b border-primary/20 pb-3">
+          <h3 className="font-display text-lg font-semibold">Household energy record</h3>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">02 / Details</span>
         </div>
-        <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm sm:grid-cols-3">
+        <dl className="grid grid-cols-2 gap-x-5 gap-y-5 text-sm sm:grid-cols-4">
           {[
             ["Annual use", `${num(m.annualKwh)} kWh`],
             ["Annual cost", hkd(m.annualCost)],
@@ -54,13 +76,13 @@ export function EnergyPassportCard({ code, name, sub, m }: { code: string; name:
             ["Highest month", MONTHS[m.peakMonth]],
             ["Summer/winter", `${num(m.seasonalityRatio, 1)}×`],
           ].map(([k, v]) => (
-            <div key={k}>
-              <dt className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{k}</dt>
-              <dd className="mt-0.5 font-medium tabular-nums">{v}</dd>
+            <div key={k} className="min-w-0 border-l border-primary/25 pl-3">
+              <dt className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{k}</dt>
+              <dd className="mt-1 break-words font-medium tabular-nums">{v}</dd>
             </div>
           ))}
         </dl>
       </div>
-    </div>
+    </article>
   );
 }
