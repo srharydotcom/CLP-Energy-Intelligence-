@@ -14,7 +14,215 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ai_analyses: {
+        Row: {
+          created_at: string
+          id: string
+          input: Json
+          module: string
+          output: Json
+          subject_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          input: Json
+          module: string
+          output: Json
+          subject_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          input?: Json
+          module?: string
+          output?: Json
+          subject_id?: string | null
+        }
+        Relationships: []
+      }
+      business_sites: {
+        Row: {
+          current_option_id: string | null
+          id: string
+          monthly_mwh: Json
+          name: string
+          peak_kw: number
+          peak_share: number
+          sector: string
+        }
+        Insert: {
+          current_option_id?: string | null
+          id: string
+          monthly_mwh: Json
+          name: string
+          peak_kw: number
+          peak_share: number
+          sector: string
+        }
+        Update: {
+          current_option_id?: string | null
+          id?: string
+          monthly_mwh?: Json
+          name?: string
+          peak_kw?: number
+          peak_share?: number
+          sector?: string
+        }
+        Relationships: []
+      }
+      homes: {
+        Row: {
+          district: string
+          end_use_share: Json
+          floor_area_m2: number
+          id: string
+          monthly_kwh: Json
+          name: string
+          occupants: number
+          peer_median_kwh: number
+          tariff_id: string | null
+        }
+        Insert: {
+          district: string
+          end_use_share: Json
+          floor_area_m2: number
+          id: string
+          monthly_kwh: Json
+          name: string
+          occupants: number
+          peer_median_kwh: number
+          tariff_id?: string | null
+        }
+        Update: {
+          district?: string
+          end_use_share?: Json
+          floor_area_m2?: number
+          id?: string
+          monthly_kwh?: Json
+          name?: string
+          occupants?: number
+          peer_median_kwh?: number
+          tariff_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "homes_tariff_id_fkey"
+            columns: ["tariff_id"]
+            isOneToOne: false
+            referencedRelation: "tariffs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      procurement_options: {
+        Row: {
+          fixed_fee_month: number
+          id: string
+          name: string
+          peak_premium: number
+          renewable_share: number
+          structure: string
+          term_years: number
+          unit_price: number
+          volatility: number
+        }
+        Insert: {
+          fixed_fee_month?: number
+          id: string
+          name: string
+          peak_premium?: number
+          renewable_share: number
+          structure: string
+          term_years: number
+          unit_price: number
+          volatility: number
+        }
+        Update: {
+          fixed_fee_month?: number
+          id?: string
+          name?: string
+          peak_premium?: number
+          renewable_share?: number
+          structure?: string
+          term_years?: number
+          unit_price?: number
+          volatility?: number
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          annual_kwh: number
+          brand: string
+          category: string
+          energy_label: number
+          id: string
+          lifetime_years: number
+          maintenance_per_year: number
+          model: string
+          price: number
+        }
+        Insert: {
+          annual_kwh: number
+          brand: string
+          category: string
+          energy_label: number
+          id: string
+          lifetime_years: number
+          maintenance_per_year?: number
+          model: string
+          price: number
+        }
+        Update: {
+          annual_kwh?: number
+          brand?: string
+          category?: string
+          energy_label?: number
+          id?: string
+          lifetime_years?: number
+          maintenance_per_year?: number
+          model?: string
+          price?: number
+        }
+        Relationships: []
+      }
+      tariffs: {
+        Row: {
+          carbon_kg_per_kwh: number
+          demand_charge_kw: number | null
+          energy_rate: number
+          fuel_adj: number
+          id: string
+          name: string
+          offpeak_rate: number | null
+          peak_rate: number | null
+          segment: string
+        }
+        Insert: {
+          carbon_kg_per_kwh?: number
+          demand_charge_kw?: number | null
+          energy_rate: number
+          fuel_adj?: number
+          id: string
+          name: string
+          offpeak_rate?: number | null
+          peak_rate?: number | null
+          segment: string
+        }
+        Update: {
+          carbon_kg_per_kwh?: number
+          demand_charge_kw?: number | null
+          energy_rate?: number
+          fuel_adj?: number
+          id?: string
+          name?: string
+          offpeak_rate?: number | null
+          peak_rate?: number | null
+          segment?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
