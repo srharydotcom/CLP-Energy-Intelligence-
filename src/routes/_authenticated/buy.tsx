@@ -20,7 +20,7 @@ import {
   type HouseholdContext, type Product,
 } from "@/lib/energy";
 
-export const Route = createFileRoute("/buy")({
+export const Route = createFileRoute("/_authenticated/buy")({
   head: () => ({
     meta: [
       { title: "Should I Buy This? — CLP Energy Intelligence" },

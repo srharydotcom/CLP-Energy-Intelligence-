@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { homesQuery, tariffsQuery } from "@/lib/queries";
 import { DEFAULT_ASSUMPTIONS, MONTHS, asArray, asRecord, effectiveRate, num, passportMetrics } from "@/lib/energy";
 
-export const Route = createFileRoute("/passport")({
+export const Route = createFileRoute("/_authenticated/passport")({
   head: () => ({
     meta: [
       { title: "Energy Passport — CLP Energy Intelligence" },

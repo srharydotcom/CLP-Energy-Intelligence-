@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { optionsQuery, sitesQuery } from "@/lib/queries";
 import { DEFAULT_ASSUMPTIONS, asArray, hkd, num, procurementResult } from "@/lib/energy";
 
-export const Route = createFileRoute("/procurement")({
+export const Route = createFileRoute("/_authenticated/procurement")({
   head: () => ({
     meta: [
       { title: "Business Energy Procurement — CLP Energy Intelligence" },

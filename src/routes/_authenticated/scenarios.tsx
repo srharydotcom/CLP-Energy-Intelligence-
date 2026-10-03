@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { homesQuery, optionsQuery, sitesQuery, tariffsQuery } from "@/lib/queries";
 import { DEFAULT_ASSUMPTIONS, asArray, passportMetrics, procurementResult, pvStream, type Assumptions } from "@/lib/energy";
 
-export const Route = createFileRoute("/scenarios")({
+export const Route = createFileRoute("/_authenticated/scenarios")({
   head: () => ({
     meta: [
       { title: "Scenario Analysis — CLP Energy Intelligence" },

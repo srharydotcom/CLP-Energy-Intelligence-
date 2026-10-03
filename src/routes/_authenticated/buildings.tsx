@@ -16,7 +16,7 @@ import { archetypesQuery, measuresQuery } from "@/lib/queries";
 import { DEFAULT_ASSUMPTIONS, hkd, num } from "@/lib/energy";
 import { WEATHER, defaultInputs, evaluateMeasures, sensitivity, type BuildingInputs, type Weather } from "@/lib/buildings";
 
-export const Route = createFileRoute("/buildings")({
+export const Route = createFileRoute("/_authenticated/buildings")({
   head: () => ({
     meta: [
       { title: "Building Energy Investments — CLP Energy Intelligence" },

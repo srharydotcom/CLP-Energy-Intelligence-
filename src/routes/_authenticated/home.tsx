@@ -16,7 +16,7 @@ import { applianceCatalogQuery, tariffsQuery } from "@/lib/queries";
 import { DEFAULT_ASSUMPTIONS, effectiveRate, hkd, inventorySummary, num, type OwnedAppliance } from "@/lib/energy";
 import { useMyHome, type MyHomeProfile } from "@/lib/my-home";
 
-export const Route = createFileRoute("/home")({
+export const Route = createFileRoute("/_authenticated/home")({
   head: () => ({
     meta: [
       { title: "My Home & Appliances — CLP Energy Intelligence" },
