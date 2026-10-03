@@ -158,3 +158,107 @@ export function procurementResult(site: Site, o: ProcurementOption, a: Assumptio
 }
 
 export const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+// ---------- Household-context purchase economics ----------
+export interface HouseholdContext {
+  areaM2: number; // area the product serves (for area-driven products)
+  occupants: number;
+  acHoursPerDay: number;
+  evKmPerYear: number;
+}
+export const AC_REF_HOURS = 8;
+
+export type SizeFit = "fits" | "undersized" | "oversized" | "n/a";
+
+/** Capacity the household needs, in the product's capacity unit. */
+export function requiredCapacity(p: Product, ctx: HouseholdContext): number | null {
+  if (p.category === "Air conditioner") return ctx.areaM2 * 0.2; // ~200 W cooling per m² (HK climate)
+  if (p.category === "Refrigerator") return 120 + 80 * ctx.occupants; // litres
+  if (p.category === "Water heater" && p.capacity != null) return 30 * ctx.occupants; // storage litres
+  return null;
+}
+
+export function sizeFit(p: Product, ctx: HouseholdContext): SizeFit {
+  const need = requiredCapacity(p, ctx);
+  if (need == null || p.capacity == null) return "n/a";
+  const r = Number(p.capacity) / need;
+  return r < 0.85 ? "undersized" : r > 1.6 ? "oversized" : "fits";
+}
+
+/** Multiplier on rated annual kWh for this household. */
+export function usageFactor(p: Product, ctx: HouseholdContext): number {
+  const ref = Number(p.reference_value) || 1;
+  const e = Number(p.usage_elasticity);
+  let ratio = 1;
+  if (p.usage_basis === "area") ratio = (ctx.areaM2 / ref) * (p.category === "Air conditioner" ? ctx.acHoursPerDay / AC_REF_HOURS : 1);
+  else if (p.usage_basis === "occupants") ratio = ctx.occupants / ref;
+  else if (p.usage_basis === "km") ratio = ctx.evKmPerYear / ref;
+  let f = Math.max(0.1, 1 + e * (ratio - 1));
+  // An undersized AC runs flat-out and loses efficiency; oversized short-cycles.
+  const fit = sizeFit(p, ctx);
+  if (p.category === "Air conditioner") f *= fit === "undersized" ? 1.25 : fit === "oversized" ? 1.08 : 1;
+  return f;
+}
+
+export interface ContextEconomics extends ProductEconomics {
+  annualKwh: number;
+  usageFactor: number;
+  fit: SizeFit;
+  required: number | null;
+  annualShiftSaving: number;
+  horizonTco: number; // PV cost of ownership over the horizon incl. replacements
+  cumulative: number[]; // nominal cumulative cost by year 0..horizon
+}
+
+export function contextEconomics(p: Product, t: Tariff, a: Assumptions, ctx: HouseholdContext): ContextEconomics {
+  const uf = usageFactor(p, ctx);
+  const annualKwh = Number(p.annual_kwh) * uf * (1 + a.usageChangePct / 100);
+  const spread = t.peak_rate != null && t.offpeak_rate != null ? Number(t.peak_rate) - Number(t.offpeak_rate) : 0;
+  const annualShiftSaving = Number(p.shift_kwh) * spread;
+  const annualCost = annualEnergyCost(Number(p.annual_kwh) * uf, t, a) - annualShiftSaving;
+  const years = p.lifetime_years;
+  const maint = Number(p.maintenance_per_year);
+  const lifetimeEnergyCost = pvStream(annualCost, years, a);
+  const lifetimeMaintenance = pvStream(maint, years, { ...a, tariffEscalationPct: 0 });
+  const lifetimeCost = Number(p.price) + lifetimeEnergyCost + lifetimeMaintenance;
+  const H = a.horizonYears;
+  const d = 1 + a.discountRatePct / 100;
+  const g = 1 + a.tariffEscalationPct / 100;
+  let horizonTco = 0;
+  const cumulative: number[] = [];
+  let cum = 0;
+  for (let y = 0; y <= H; y++) {
+    let nominal = 0;
+    if (y < H && y % years === 0) {
+      nominal += Number(p.price);
+      horizonTco += Number(p.price) / Math.pow(d, y);
+    }
+    if (y >= 1) {
+      const op = annualCost * Math.pow(g, y - 1) + maint;
+      nominal += op;
+      horizonTco += op / Math.pow(d, y);
+    }
+    cum += nominal;
+    cumulative.push(cum);
+  }
+  return {
+    product: p, annualCost, lifetimeEnergyCost, lifetimeMaintenance, lifetimeCost,
+    costPerYear: lifetimeCost / years,
+    lifetimeCo2Kg: annualKwh * Number(t.carbon_kg_per_kwh) * years,
+    annualKwh, usageFactor: uf, fit: sizeFit(p, ctx), required: requiredCapacity(p, ctx),
+    annualShiftSaving, horizonTco, cumulative,
+  };
+}
+
+/** First year in which candidate's cumulative cost drops to or below baseline's; null if never in horizon. */
+export function breakEvenYear(c: ContextEconomics, b: ContextEconomics): number | null {
+  if (c.cumulative[0] <= b.cumulative[0]) return 0;
+  for (let y = 1; y < c.cumulative.length; y++) {
+    if (c.cumulative[y] <= b.cumulative[y]) {
+      const prevGap = c.cumulative[y - 1] - b.cumulative[y - 1];
+      const gap = c.cumulative[y] - b.cumulative[y];
+      return y - 1 + prevGap / (prevGap - gap);
+    }
+  }
+  return null;
+}
