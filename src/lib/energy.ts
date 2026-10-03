@@ -305,3 +305,25 @@ export function inventorySummary(items: OwnedAppliance[], t: Tariff, a: Assumpti
     co2Tonnes: (totalKwh * Number(t.carbon_kg_per_kwh)) / 1000,
   };
 }
+
+// ---------- Passport for a user's saved home (built from its appliance list) ----------
+/** Demo benchmark: typical yearly use for a similar HK home. Invented figures, replace with real data. */
+export const PEER_BASE_KWH = 1500;
+export const PEER_PER_PERSON_KWH = 900;
+export const PEER_PER_M2_KWH = 25;
+export function peerBenchmarkKwh(occupants: number, areaM2: number) {
+  return PEER_BASE_KWH + PEER_PER_PERSON_KWH * occupants + PEER_PER_M2_KWH * areaM2;
+}
+export function gradeFromScore(score: number): PassportMetrics["grade"] {
+  return score >= 80 ? "A" : score >= 65 ? "B" : score >= 50 ? "C" : score >= 35 ? "D" : "E";
+}
+export function inventoryPassport(items: OwnedAppliance[], occupants: number, areaM2: number, t: Tariff, a: Assumptions) {
+  const s = inventorySummary(items, t, a);
+  const peer = peerBenchmarkKwh(occupants, areaM2);
+  const vsPeerPct = peer ? (s.totalKwh / peer - 1) * 100 : 0;
+  const score = Math.max(0, Math.min(100, Math.round(70 - vsPeerPct * 1.2)));
+  return {
+    summary: s, peer, vsPeerPct, score, grade: gradeFromScore(score),
+    kwhPerM2: areaM2 ? s.totalKwh / areaM2 : 0, kwhPerPerson: occupants ? s.totalKwh / occupants : 0,
+  };
+}

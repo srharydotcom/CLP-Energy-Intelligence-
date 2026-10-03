@@ -9,7 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedBuildingsRouteImport } from './routes/_authenticated/buildings'
 import { Route as AuthenticatedBuyRouteImport } from './routes/_authenticated/buy'
@@ -18,9 +18,8 @@ import { Route as AuthenticatedPassportRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProcurementRouteImport } from './routes/_authenticated/procurement'
 import { Route as AuthenticatedScenariosRouteImport } from './routes/_authenticated/scenarios'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -29,39 +28,39 @@ const AuthRoute = AuthRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedBuildingsRoute = AuthenticatedBuildingsRouteImport.update({
-  id: '/_authenticated/buildings',
+  id: '/buildings',
   path: '/buildings',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedBuyRoute = AuthenticatedBuyRouteImport.update({
-  id: '/_authenticated/buy',
+  id: '/buy',
   path: '/buy',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
-  id: '/_authenticated/home',
+  id: '/home',
   path: '/home',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPassportRoute = AuthenticatedPassportRouteImport.update({
-  id: '/_authenticated/passport',
+  id: '/passport',
   path: '/passport',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProcurementRoute =
   AuthenticatedProcurementRouteImport.update({
-    id: '/_authenticated/procurement',
+    id: '/procurement',
     path: '/procurement',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedScenariosRoute = AuthenticatedScenariosRouteImport.update({
-  id: '/_authenticated/scenarios',
+  id: '/scenarios',
   path: '/scenarios',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/buildings': typeof AuthenticatedBuildingsRoute
   '/buy': typeof AuthenticatedBuyRoute
@@ -71,7 +70,7 @@ export interface FileRoutesByFullPath {
   '/scenarios': typeof AuthenticatedScenariosRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/buildings': typeof AuthenticatedBuildingsRoute
   '/buy': typeof AuthenticatedBuyRoute
@@ -82,7 +81,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/buildings': typeof AuthenticatedBuildingsRoute
   '/_authenticated/buy': typeof AuthenticatedBuyRoute
@@ -114,7 +113,7 @@ export interface FileRouteTypes {
     | '/scenarios'
   id:
     | '__root__'
-    | '/'
+    | '/_authenticated'
     | '/auth'
     | '/_authenticated/buildings'
     | '/_authenticated/buy'
@@ -125,23 +124,17 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  AuthenticatedBuildingsRoute: typeof AuthenticatedBuildingsRoute
-  AuthenticatedBuyRoute: typeof AuthenticatedBuyRoute
-  AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
-  AuthenticatedPassportRoute: typeof AuthenticatedPassportRoute
-  AuthenticatedProcurementRoute: typeof AuthenticatedProcurementRoute
-  AuthenticatedScenariosRoute: typeof AuthenticatedScenariosRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -156,55 +149,70 @@ declare module '@tanstack/react-router' {
       path: '/buildings'
       fullPath: '/buildings'
       preLoaderRoute: typeof AuthenticatedBuildingsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/buy': {
       id: '/_authenticated/buy'
       path: '/buy'
       fullPath: '/buy'
       preLoaderRoute: typeof AuthenticatedBuyRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/home': {
       id: '/_authenticated/home'
       path: '/home'
       fullPath: '/home'
       preLoaderRoute: typeof AuthenticatedHomeRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/passport': {
       id: '/_authenticated/passport'
       path: '/passport'
       fullPath: '/passport'
       preLoaderRoute: typeof AuthenticatedPassportRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/procurement': {
       id: '/_authenticated/procurement'
       path: '/procurement'
       fullPath: '/procurement'
       preLoaderRoute: typeof AuthenticatedProcurementRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/scenarios': {
       id: '/_authenticated/scenarios'
       path: '/scenarios'
       fullPath: '/scenarios'
       preLoaderRoute: typeof AuthenticatedScenariosRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AuthRoute: AuthRoute,
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBuildingsRoute: typeof AuthenticatedBuildingsRoute
+  AuthenticatedBuyRoute: typeof AuthenticatedBuyRoute
+  AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedPassportRoute: typeof AuthenticatedPassportRoute
+  AuthenticatedProcurementRoute: typeof AuthenticatedProcurementRoute
+  AuthenticatedScenariosRoute: typeof AuthenticatedScenariosRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBuildingsRoute: AuthenticatedBuildingsRoute,
   AuthenticatedBuyRoute: AuthenticatedBuyRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedPassportRoute: AuthenticatedPassportRoute,
   AuthenticatedProcurementRoute: AuthenticatedProcurementRoute,
   AuthenticatedScenariosRoute: AuthenticatedScenariosRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
