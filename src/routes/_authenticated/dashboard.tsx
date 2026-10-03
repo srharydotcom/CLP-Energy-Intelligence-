@@ -134,8 +134,7 @@ function BusinessOverview() {
   const totalOpportunity = siteStats.reduce((a, x) => a + (x.cur.annualCost - x.best.annualCost), 0);
 
   const modules = [
-    { to: "/passport", icon: IdCard, title: "Energy Passport", stat: `${homeStats.length} homes rated`, sub: "Grade, intensity and peer benchmark" },
-    { to: "/buy", icon: ShoppingCart, title: "Should I Buy This?", stat: `${products.data?.length ?? 0} products`, sub: "Lifetime cost and payback" },
+    { to: "/buildings", icon: Building2, title: "Building Investments", stat: "7 measure types", sub: "Upfront, savings, payback" },
     { to: "/procurement", icon: Building2, title: "Business Procurement", stat: `${hkd(totalOpportunity)}/yr opportunity`, sub: "Cost, risk band and emissions" },
     { to: "/scenarios", icon: GitBranch, title: "Scenario Analysis", stat: "7 scenarios", sub: "Fuel, usage, carbon, load shift" },
   ] as const;

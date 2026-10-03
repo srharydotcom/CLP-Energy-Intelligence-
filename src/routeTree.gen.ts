@@ -13,6 +13,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedBuildingsRouteImport } from './routes/_authenticated/buildings'
 import { Route as AuthenticatedBuyRouteImport } from './routes/_authenticated/buy'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedPassportRouteImport } from './routes/_authenticated/passport'
 import { Route as AuthenticatedProcurementRouteImport } from './routes/_authenticated/procurement'
@@ -35,6 +36,11 @@ const AuthenticatedBuildingsRoute = AuthenticatedBuildingsRouteImport.update({
 const AuthenticatedBuyRoute = AuthenticatedBuyRouteImport.update({
   id: '/buy',
   path: '/buy',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/buildings': typeof AuthenticatedBuildingsRoute
   '/buy': typeof AuthenticatedBuyRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/home': typeof AuthenticatedHomeRoute
   '/passport': typeof AuthenticatedPassportRoute
   '/procurement': typeof AuthenticatedProcurementRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/buildings': typeof AuthenticatedBuildingsRoute
   '/buy': typeof AuthenticatedBuyRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/home': typeof AuthenticatedHomeRoute
   '/passport': typeof AuthenticatedPassportRoute
   '/procurement': typeof AuthenticatedProcurementRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/buildings': typeof AuthenticatedBuildingsRoute
   '/_authenticated/buy': typeof AuthenticatedBuyRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/passport': typeof AuthenticatedPassportRoute
   '/_authenticated/procurement': typeof AuthenticatedProcurementRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/buildings'
     | '/buy'
+    | '/dashboard'
     | '/home'
     | '/passport'
     | '/procurement'
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/buildings'
     | '/buy'
+    | '/dashboard'
     | '/home'
     | '/passport'
     | '/procurement'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/buildings'
     | '/_authenticated/buy'
+    | '/_authenticated/dashboard'
     | '/_authenticated/home'
     | '/_authenticated/passport'
     | '/_authenticated/procurement'
@@ -158,6 +170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBuyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/home': {
       id: '/_authenticated/home'
       path: '/home'
@@ -192,6 +211,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBuildingsRoute: typeof AuthenticatedBuildingsRoute
   AuthenticatedBuyRoute: typeof AuthenticatedBuyRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedPassportRoute: typeof AuthenticatedPassportRoute
   AuthenticatedProcurementRoute: typeof AuthenticatedProcurementRoute
@@ -201,6 +221,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBuildingsRoute: AuthenticatedBuildingsRoute,
   AuthenticatedBuyRoute: AuthenticatedBuyRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedPassportRoute: AuthenticatedPassportRoute,
   AuthenticatedProcurementRoute: AuthenticatedProcurementRoute,
