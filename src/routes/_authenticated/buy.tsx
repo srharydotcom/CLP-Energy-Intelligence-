@@ -143,7 +143,20 @@ function BuyPage() {
   const cand = rows.find((r) => r.product.id === selected) ?? best;
 
   const header = <PageHeader kicker="Module 02" title="Should I Buy This?" sub="Cost a product in your own home — its size, your household and your tariff — and compare its total cost of ownership with the alternatives." />;
-  if (!tariff || !cand || !baseline || !best) return <>{header}<Skeleton className="h-96" /></>;
+  if (!tariff || products.isLoading) return <>{header}<Skeleton className="h-96" /></>;
+  if (!cand || !baseline || !best) return (
+    <>{header}
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <Tabs value={category} onValueChange={(c) => { setCategory(c); setSelected(undefined); }}>
+          <TabsList className="flex-wrap">{[...categories, ...(categories.includes("Other") ? [] : ["Other"])].map((c) => <TabsTrigger key={c} value={c}>{c === "Other" ? "Something else" : c}</TabsTrigger>)}</TabsList>
+        </Tabs>
+      </div>
+      <div className="rounded-lg border border-dashed p-10 text-center">
+        <p className="mb-4 text-muted-foreground">Nothing to compare here yet. Add the products you're choosing between — at least two.</p>
+        <AddProductDialog category={category} onAdd={(p) => { setCustom((c) => [...c, p]); setSelected(p.id); }} />
+      </div>
+    </>
+  );
 
   const pb = payback(cand, baseline);
   const be = breakEvenYear(cand, baseline);
@@ -162,13 +175,6 @@ function BuyPage() {
               {myHomes.homes.map((h) => <SelectItem key={h.id} value={`mine:${h.id}`}>{h.profile.name}</SelectItem>)}
               {homes.data?.map((h) => <SelectItem key={h.id} value={h.id}>Example: {h.name}</SelectItem>)}
             </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label className="text-xs text-muted-foreground">Tariff</Label>
-          <Select value={tariff.id} onValueChange={setTariffId}>
-            <SelectTrigger className="mt-1 h-9"><SelectValue /></SelectTrigger>
-            <SelectContent>{tariffs.data?.filter((t) => t.segment === "residential").map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
         {category === "Air conditioner" ? (
@@ -218,7 +224,7 @@ function BuyPage() {
             <div className="text-sm text-muted-foreground">Includes {hkd(cand.annualShiftSaving)}/yr from moving {num(Number(cand.product.shift_kwh))} kWh from peak to off-peak on your tariff.</div>
           )}
           {cand.product.category === "Home battery" && cand.annualShiftSaving === 0 && (
-            <div className="text-sm text-warning">Your tariff has no peak/off-peak split, so a battery cannot save money by shifting usage. Try the Time-of-Use tariff.</div>
+            <div className="text-sm text-warning">Your electricity plan charges the same price all day, so a battery can&apos;t save you money. It only pays off on a plan with cheaper night-time electricity (see Advanced).</div>
           )}
 
           <AIAnalysisPanel
@@ -239,7 +245,16 @@ function BuyPage() {
             }}
           />
         </div>
-        <div className="space-y-4">
+        <Collapsible className="space-y-4">
+          <CollapsibleTrigger asChild><Button variant="outline" className="w-full">Advanced: electricity plan & assumptions</Button></CollapsibleTrigger>
+          <CollapsibleContent className="space-y-4">
+          <div className="rounded-lg border bg-card p-4">
+            <Label className="text-xs text-muted-foreground">Electricity plan</Label>
+            <Select value={tariff.id} onValueChange={setTariffId}>
+              <SelectTrigger className="mt-1 h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>{tariffs.data?.filter((t) => t.segment === "residential").map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
           <AssumptionPanel value={a} onChange={setA} fields={["horizonYears", "tariffEscalationPct", "discountRatePct", "fuelAdjDelta", "usageChangePct", "carbonPricePerTonne"]} />
           <div className="rounded-lg border bg-card p-4 text-xs text-muted-foreground space-y-1.5">
             <div className="font-mono text-[11px] uppercase tracking-widest">How we estimate</div>
@@ -248,7 +263,8 @@ function BuyPage() {
             <p>Cost to own = purchase (with replacements inside the horizon) + energy + upkeep, discounted to today. Break-even uses cumulative spend.</p>
             <p>Electricity: {hkd(effectiveRate(tariff, a), 2)}/kWh on {tariff.name}.</p>
           </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
     </>
   );
