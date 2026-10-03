@@ -139,7 +139,10 @@
   .bg-popover { backdrop-filter: blur(24px); }
   /* Ambient atmosphere — decorative only, never blocks clicks */
   .ambient {
-    background: radial-gradient(var(--dot) 1px, transparent 1px) 0 0 / 22px 22px;
+    background:
+      radial-gradient(40rem 28rem at 85% -5%, var(--glow-1), transparent 70%),
+      radial-gradient(36rem 30rem at 5% 105%, var(--glow-2), transparent 70%),
+      radial-gradient(var(--dot) 1px, transparent 1px) 0 0 / 22px 22px;
   }
   /* Tactile press feel for interactive cards and buttons */
   .tactile { transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), border-color 150ms; }
