@@ -2,7 +2,7 @@ import { useAreaUnit } from "@/lib/units";
 import { AreaUnitToggle } from "@/components/energy/AreaUnitToggle";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Plus, Trash2, CheckCircle2, XCircle } from "lucide-react";
 import { PageHeader } from "@/components/energy/AppShell";
 import { AssumptionPanel } from "@/components/energy/AssumptionPanel";
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_authenticated/buildings")({
   component: BuildingsPage,
 });
 
-function F({ label, value, onChange, step = 1, suffix, placeholder, extra }: { label: string; value: number | null; onChange: (n: number | null) => void; step?: number | undefined; suffix?: string | undefined; placeholder?: string; extra?: React.ReactNode }) {
+function F({ label, value, onChange, step = 1, suffix, placeholder, extra }: { label: string; value: number | null; onChange: (n: number | null) => void; step?: number | undefined; suffix?: string | undefined; placeholder?: string; extra?: ReactNode }) {
   return (
     <div className="space-y-1">
       <Label className="text-xs text-muted-foreground">{label}{suffix && <span className="ml-1 font-mono">({suffix})</span>}{extra}</Label>

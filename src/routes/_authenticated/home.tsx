@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Plus, Trash2, PackagePlus, Sparkles, ChevronDown } from "lucide-react";
 import { useAreaUnit } from "@/lib/units";
 import { AreaUnitToggle } from "@/components/energy/AreaUnitToggle";
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_authenticated/home")({
 
 const MISC_CATEGORIES = ["Kitchen", "Electronics", "Personal care", "Garden & outdoor", "Hobby & tools", "Health", "Pets & aquarium", "Other"];
 
-function NumField({ label, value, onChange, step = 1, suffix, extra }: { label: string; value: number; onChange: (n: number) => void; step?: number; suffix?: string; extra?: React.ReactNode }) {
+function NumField({ label, value, onChange, step = 1, suffix, extra }: { label: string; value: number; onChange: (n: number) => void; step?: number; suffix?: string; extra?: ReactNode }) {
   return (
     <div className="space-y-1">
       <Label className="text-xs text-muted-foreground">{label}{suffix && <span className="ml-1 font-mono">({suffix})</span>}{extra}</Label>
