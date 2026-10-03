@@ -73,7 +73,7 @@ function PassportPage() {
         <EnergyPassportCard code={p.name.slice(0, 12).toUpperCase()} name={p.name} sub={`${p.district || "Hong Kong"} · ${num(u.show(p.areaM2))} ${u.label} · ${p.occupants} people`} m={m} />
 
         <div className="passport-four-sections">
-          <section className="passport-page p-5 sm:p-6">
+          <section className="passport-page">
             <div className="passport-page-heading"><span>03 / Method</span><span>Energy passport</span></div>
             <h2 className="mb-5 font-display text-xl font-semibold">How we worked this out</h2>
             <ol className="space-y-3 text-sm">
@@ -96,7 +96,7 @@ function PassportPage() {
             <p className="mt-3 text-xs text-muted-foreground">The “similar homes” figures are demo numbers, not official statistics.</p>
           </section>
 
-          <section className="passport-page p-5 sm:p-6">
+          <section className="passport-page">
             <div className="passport-page-heading"><span>04 / Usage</span><span>Energy passport</span></div>
             <div className="mb-5 font-display text-xl font-semibold">Estimated use by month <span className="font-mono text-xs font-normal text-muted-foreground">· kWh</span></div>
             <div className="h-64">
@@ -111,7 +111,7 @@ function PassportPage() {
               </ResponsiveContainer>
             </div>
           </section>
-          <section className="passport-page p-5 sm:p-6">
+          <section className="passport-page">
           <div className="passport-page-heading"><span>05 / Inventory</span><span>Energy passport</span></div>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="font-display text-xl font-semibold">Appliances in this home</h2>
@@ -135,14 +135,14 @@ function PassportPage() {
           </table></div>
           </section>
 
-          <div className="passport-analysis">
+          <section className="passport-page passport-analysis">
           <div className="passport-page-heading"><span>06 / Findings</span><span>Energy passport</span></div>
           <AIAnalysisPanel
             module="passport"
             subjectId={active.id}
             metrics={{ home: p, grade: r.grade, score: r.score, annual_kwh: Math.round(s.totalKwh), annual_cost_hkd: Math.round(s.totalCost), similar_homes_kwh: Math.round(r.peer), vs_similar_pct: +r.vsPeerPct.toFixed(1), by_end_use_kwh: Object.fromEntries(Object.entries(s.byEndUse).map(([k, v]) => [k, Math.round(v)])), appliances: s.rows.map((x) => ({ name: x.item.name, annual_cost_hkd: Math.round(x.cost) })) }}
           />
-          </div>
+          </section>
         </div>
       </div>
     </>
@@ -160,30 +160,9 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="passport-spread passport-empty">
-      <div className="passport-cover relative overflow-hidden">
-        <div className="passport-spine" aria-hidden="true" />
-        <div className="passport-cover-inner">
-          <div className="passport-cover-top font-mono text-[10px] uppercase text-primary"><span>CLP · Hong Kong</span><span>Residential / HK</span></div>
-          <div className="passport-cover-center">
-            <div className="passport-seal" aria-hidden="true"><span>CLP</span><span>ENERGY</span></div>
-            <div className="mt-6 font-mono text-[10px] uppercase text-primary">Household energy record</div>
-            <h2 className="mt-3 font-display text-4xl font-semibold leading-none sm:text-5xl">Energy<br />Passport</h2>
-            <div className="passport-cover-mark" aria-hidden="true">HK</div>
-          </div>
-          <div className="passport-cover-bottom font-mono text-[10px] uppercase text-primary"><span>Energy intelligence</span><span>01 / 06</span></div>
-        </div>
-      </div>
-      <div className="passport-sheet flex flex-col">
-        <div className="passport-sheet-masthead font-mono text-[10px] uppercase"><span>CLP / Energy Intelligence</span><span>HK · 02</span></div>
-        <div className="flex flex-1 flex-col items-start justify-center py-12">
-          <div className="font-mono text-[10px] uppercase text-muted-foreground">Awaiting household details</div>
-          <h3 className="mt-3 font-display text-2xl font-semibold">Your record starts here.</h3>
-          <p className="mt-3 max-w-sm text-sm text-muted-foreground">{text}</p>
-          <Button asChild className="mt-6"><Link to="/home">Go to My Home</Link></Button>
-        </div>
-        <div className="passport-sheet-footer font-mono text-[10px] uppercase"><span>Residential energy record</span><span>02 / 06</span></div>
-      </div>
+    <div className="rounded-lg border border-dashed p-10 text-center">
+      <p className="mb-4 text-muted-foreground">{text}</p>
+      <Button asChild><Link to="/home">Go to My Home</Link></Button>
     </div>
   );
 }
