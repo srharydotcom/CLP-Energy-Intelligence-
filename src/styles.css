@@ -152,54 +152,104 @@
   button:not(:disabled), a { -webkit-tap-highlight-color: transparent; }
 
 
-  /* Passport: a cloth-bound cover followed by numbered paper-like record pages. */
-  .passport-cover {
+  /* Passport booklet: every page is the same fixed size; pages pair into open spreads. */
+  .passport-book { display: grid; gap: 32px; max-width: 1080px; margin-inline: auto; }
+  .passport-spread { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .passport-leaf {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: 640px;
+    padding: 26px 28px 18px;
+    overflow: hidden;
     border: 1px solid var(--passport-rule);
-    border-radius: 6px;
-    background-color: var(--passport-cover-deep);
-    box-shadow: inset 0 0 0 5px var(--passport-cover-deep), inset 0 0 0 6px var(--passport-rule), 0 24px 50px -24px oklch(0 0 0 / 0.55);
+    border-radius: 12px;
+    color: var(--passport-ink);
+    background-color: var(--passport-paper);
+    background-image:
+      repeating-radial-gradient(circle at 50% 115%, transparent 0 13px, color-mix(in oklab, var(--passport-rule) 45%, transparent) 14px, transparent 15px),
+      repeating-linear-gradient(135deg, transparent 0 22px, color-mix(in oklab, var(--passport-rule) 22%, transparent) 23px, transparent 24px);
+    box-shadow: 0 18px 40px -24px oklch(0 0 0 / 0.7);
   }
-  .passport-spine {
+  /* Faint security seal printed in the middle of every paper page. */
+  .passport-leaf::before {
+    content: "";
     position: absolute;
-    inset: 0 auto 0 0;
-    width: 9px;
-    background: repeating-linear-gradient(90deg, var(--passport-cover-deep) 0 2px, var(--passport-rule) 3px, var(--passport-cover) 4px 6px);
-    border-right: 1px solid var(--passport-rule);
+    z-index: -1;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 300px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 10px double color-mix(in oklab, var(--passport-rule) 55%, transparent);
     pointer-events: none;
   }
-  .passport-cover-inner {
-    margin: 6px 6px 6px 14px;
-    padding: clamp(20px, 4vw, 40px);
-    border: 1px solid var(--passport-rule);
-    background-color: var(--passport-cover);
+  .passport-leaf-body { flex: 1; min-height: 0; overflow: auto; scrollbar-color: var(--passport-rule) transparent; }
+  .passport-leaf-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--passport-rule);
+    color: var(--passport-muted);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
   }
+  .passport-leaf .text-muted-foreground { color: var(--passport-muted) !important; }
+  .passport-leaf .text-primary { color: var(--passport-ink) !important; }
+  .passport-leaf .text-foreground { color: var(--passport-ink) !important; }
+  .passport-leaf .border-b, .passport-leaf .border-l, .passport-leaf .border-t { border-color: var(--passport-rule); }
+  .passport-leaf > .passport-leaf-body > .bg-card { padding: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important; backdrop-filter: none !important; color: var(--passport-ink); }
+  .passport-leaf .border-dashed, .passport-leaf .rounded-md.border { border-color: var(--passport-rule) !important; }
+  /* Outline buttons printed onto the paper instead of dark glass. */
+  .passport-leaf:not(.passport-leaf--cover) .border-input.bg-background { background: transparent !important; border-color: var(--passport-ink) !important; color: var(--passport-ink) !important; }
+
+  /* Cover page: cloth-bound, framed with a gold rule. */
+  .passport-leaf--cover {
+    color: var(--foreground);
+    background-color: var(--passport-cover);
+    background-image: radial-gradient(circle at 50% 38%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 60%);
+    box-shadow: inset 0 0 0 10px var(--passport-cover), inset 0 0 0 11px color-mix(in oklab, var(--primary) 45%, transparent), 0 18px 40px -24px oklch(0 0 0 / 0.7);
+  }
+  .passport-leaf--cover::before { display: none; }
+  .passport-leaf--cover .text-primary { color: var(--primary) !important; }
+  .passport-leaf--cover .text-muted-foreground { color: var(--muted-foreground) !important; }
+  .passport-leaf--cover .text-foreground { color: var(--foreground) !important; }
+  .passport-leaf--cover .passport-leaf-footer { color: var(--muted-foreground); border-color: color-mix(in oklab, var(--primary) 30%, transparent); }
+
   .passport-seal {
-    width: 72px;
-    height: 72px;
+    width: 92px;
+    height: 92px;
     flex: none;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border: 2px double var(--primary);
+    border: 3px double var(--primary);
     border-radius: 50%;
     color: var(--primary);
     font-family: var(--font-mono);
     font-size: 9px;
     line-height: 1.4;
-    letter-spacing: 0;
+    letter-spacing: 0.2em;
   }
-  .passport-seal span:first-child { font-size: 17px; font-weight: 600; }
+  .passport-seal span:first-child { font-size: 20px; font-weight: 600; letter-spacing: 0.05em; }
   .passport-grade {
     display: grid;
     place-items: center;
-    width: 62px;
-    height: 62px;
+    width: 58px;
+    height: 58px;
     border-radius: 50%;
     border: 3px double var(--passport-cover-deep);
     color: var(--passport-cover-deep);
     font-family: var(--font-display);
-    font-size: 34px;
+    font-size: 30px;
     font-weight: 700;
     line-height: 1;
   }
@@ -213,17 +263,21 @@
     height: 4px;
     background: var(--primary);
   }
-  .passport-sheet, .passport-page {
-    background-color: var(--passport-paper);
+  /* Printed machine-readable lines at the foot of the record page. */
+  .passport-mrz {
+    margin-top: 18px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    background: color-mix(in oklab, var(--passport-rule) 25%, transparent);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.6;
+    letter-spacing: 0.12em;
     color: var(--passport-ink);
-    border: 1px solid var(--passport-rule);
-    border-radius: 2px 6px 6px 2px;
-    box-shadow: inset 5px 0 9px -7px var(--passport-ink), 0 8px 24px -16px oklch(0 0 0 / 0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
   }
-  .passport-sheet { padding: clamp(20px, 4vw, 40px); border-top: 4px double var(--passport-rule); }
-  .passport-sheet .text-muted-foreground, .passport-page .text-muted-foreground { color: var(--passport-muted); }
-  .passport-sheet .text-primary, .passport-page .text-primary { color: var(--passport-ink); }
-  .passport-page .border-b, .passport-page .border-l { border-color: var(--passport-rule); }
   .passport-page-heading {
     display: flex;
     flex-wrap: wrap;
@@ -236,20 +290,35 @@
     font-family: var(--font-mono);
     font-size: 10px;
     text-transform: uppercase;
-    letter-spacing: 0;
+    letter-spacing: 0.15em;
   }
-  .passport-analysis { background-color: var(--passport-paper); }
-  .passport-analysis > .bg-card { padding: 0; border: 0; background: transparent; box-shadow: none; backdrop-filter: none; color: var(--passport-ink); }
-  /* Four equally proportioned document panels, with overflow kept inside each panel. */
-  .passport-four-sections { display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: 620px; gap: 20px; max-width: 1050px; margin-inline: auto; }
-  .passport-four-sections > * { min-width: 0; min-height: 0; padding: 24px; overflow: auto; scrollbar-color: var(--passport-rule) transparent; }
-  .passport-analysis > .bg-card .text-muted-foreground { color: var(--passport-muted); }
-  .passport-analysis > .bg-card .text-foreground { color: var(--passport-ink); }
 }
 
 @media (min-width: 900px) {
-  .passport-four-sections { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 580px; }
-}
-
-@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  /* Open booklet: two equal pages joined at a stitched centre fold. */
+  .passport-spread { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-radius: 14px; box-shadow: 0 34px 70px -34px oklch(0 0 0 / 0.85); }
+  .passport-spread > .passport-leaf { box-shadow: none; }
+  .passport-spread > .passport-leaf:first-child {
+    border-radius: 14px 3px 3px 14px;
+    border-right: 0;
+    box-shadow: inset -26px 0 26px -24px oklch(0 0 0 / 0.45);
+  }
+  .passport-spread > .passport-leaf:last-child {
+    border-radius: 3px 14px 14px 3px;
+    box-shadow: inset 26px 0 26px -24px oklch(0 0 0 / 0.45);
+  }
+  .passport-spread > .passport-leaf--cover:first-child {
+    box-shadow: inset 0 0 0 10px var(--passport-cover), inset 0 0 0 11px color-mix(in oklab, var(--primary) 45%, transparent), inset -26px 0 26px -20px oklch(0 0 0 / 0.6);
+  }
+  .passport-spread::after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    top: 28px;
+    bottom: 28px;
+    left: 50%;
+    border-left: 2px dashed color-mix(in oklab, var(--passport-ink) 30%, transparent);
+    transform: translateX(-1px);
+    pointer-events: none;
+  }
 }
