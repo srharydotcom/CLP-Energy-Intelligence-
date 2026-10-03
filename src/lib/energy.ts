@@ -327,3 +327,39 @@ export function inventoryPassport(items: OwnedAppliance[], occupants: number, ar
     kwhPerM2: areaM2 ? s.totalKwh / areaM2 : 0, kwhPerPerson: occupants ? s.totalKwh / occupants : 0,
   };
 }
+
+// ---------- Upgrade suggestions for owned appliances ----------
+const CATALOG_TO_PRODUCT: Record<string, string> = {
+  "ac-split": "Air conditioner", "ac-window": "Air conditioner", fridge: "Refrigerator", "wh-storage": "Water heater",
+  washer: "Washing machine", dryer: "Dryer", dehumid: "Dehumidifier", induction: "Cooktop", dishwasher: "Dishwasher",
+  "led-lights": "Lighting", "cfl-lights": "Lighting",
+};
+const CATEGORY_TO_PRODUCT: Record<string, string> = { "Air conditioner": "Air conditioner", Refrigerator: "Refrigerator", "Water heater": "Water heater", TV: "TV" };
+export function productCategoryFor(x: OwnedAppliance): string | null {
+  return (x.catalogId && CATALOG_TO_PRODUCT[x.catalogId]) || CATEGORY_TO_PRODUCT[x.category] || null;
+}
+
+export interface UpgradeSuggestion {
+  item: OwnedAppliance;
+  currentCost: number;
+  best: ContextEconomics;
+  yearlySaving: number;
+  paybackYears: number | null;
+}
+/** For each owned appliance with a comparable product, the lowest cost-to-own model that suits the home. */
+export function upgradeSuggestions(items: OwnedAppliance[], products: Product[], t: Tariff, a: Assumptions, ctx: HouseholdContext): UpgradeSuggestion[] {
+  const out: UpgradeSuggestion[] = [];
+  for (const x of items) {
+    const cat = productCategoryFor(x);
+    if (!cat) continue;
+    const rows = products.filter((p) => p.category === cat).map((p) => contextEconomics(p, t, a, ctx));
+    const pool = rows.filter((r) => r.fit !== "undersized");
+    const best = (pool.length ? pool : rows).reduce<ContextEconomics | undefined>((b, r) => (!b || r.horizonTco < b.horizonTco ? r : b), undefined);
+    if (!best) continue;
+    const perUnit = (applianceAnnualKwh(x) / Math.max(1, x.quantity)) * effectiveRate(t, a);
+    const currentCost = perUnit;
+    const yearlySaving = currentCost - best.annualCost;
+    out.push({ item: x, currentCost, best, yearlySaving, paybackYears: yearlySaving > 0 ? Number(best.product.price) / yearlySaving : null });
+  }
+  return out.sort((p, q) => q.yearlySaving - p.yearlySaving);
+}
