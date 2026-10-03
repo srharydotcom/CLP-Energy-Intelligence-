@@ -151,3 +151,144 @@
   .tactile:active { transform: scale(0.96); }
   button:not(:disabled), a { -webkit-tap-highlight-color: transparent; }
 }
+
+/*
+ * Energy Passport booklet.
+ * Every page shares ONE size (--pp-w × --pp-h). Pages never stretch to fit
+ * content — long content scrolls inside the page.
+ */
+.pp-book {
+  --pp-w: 460px;
+  --pp-h: 660px;
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+.pp-spread {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+}
+.pp-page {
+  /* Re-theme everything printed on paper so text is always dark ink. */
+  --background: var(--passport-paper);
+  --foreground: var(--passport-ink);
+  --card: transparent;
+  --card-foreground: var(--passport-ink);
+  --popover: var(--passport-paper);
+  --popover-foreground: var(--passport-ink);
+  --muted: oklch(0.88 0.025 88);
+  --muted-foreground: var(--passport-muted);
+  --accent: oklch(0.89 0.03 88);
+  --accent-foreground: var(--passport-ink);
+  --secondary: oklch(0.89 0.03 88);
+  --secondary-foreground: var(--passport-ink);
+  --border: var(--passport-rule);
+  --input: oklch(0.45 0.03 175 / 0.6);
+  --primary: oklch(0.58 0.13 75);
+  --primary-foreground: oklch(0.99 0.01 88);
+  --positive: oklch(0.48 0.13 155);
+  --warning: oklch(0.55 0.16 45);
+  --destructive: oklch(0.5 0.2 25);
+
+  position: relative;
+  isolation: isolate;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: min(var(--pp-w), 100%);
+  height: var(--pp-h);
+  padding: 26px 28px 18px;
+  overflow: hidden;
+  border: 1px solid var(--passport-rule);
+  border-radius: 12px;
+  color: var(--foreground);
+  background-color: var(--passport-paper);
+  background-image:
+    repeating-radial-gradient(circle at 50% 115%, transparent 0 13px, color-mix(in oklab, var(--passport-rule) 40%, transparent) 14px, transparent 15px),
+    repeating-linear-gradient(135deg, transparent 0 22px, color-mix(in oklab, var(--passport-rule) 20%, transparent) 23px, transparent 24px);
+  box-shadow: 0 18px 40px -24px oklch(0 0 0 / 0.7);
+}
+.pp-page::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  width: 280px;
+  height: 280px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 10px double color-mix(in oklab, var(--passport-rule) 50%, transparent);
+  pointer-events: none;
+}
+.pp-page .bg-card { backdrop-filter: none; box-shadow: none; }
+.pp-head, .pp-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted-foreground);
+}
+.pp-head { margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid var(--passport-rule); }
+.pp-foot { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--passport-rule); }
+.pp-body { flex: 1; min-height: 0; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--passport-rule) transparent; }
+
+/* Cover: dark cloth with a gold frame — keeps the app's dark theme colours. */
+.pp-page.pp-cover {
+  --background: var(--passport-cover);
+  --foreground: oklch(0.95 0.01 240);
+  --muted-foreground: oklch(0.75 0.02 200);
+  --primary: oklch(0.82 0.16 85);
+  background-color: var(--passport-cover);
+  background-image: radial-gradient(circle at 50% 38%, oklch(0.82 0.16 85 / 0.10), transparent 60%);
+  border-color: oklch(0.82 0.16 85 / 0.35);
+  box-shadow: inset 0 0 0 10px var(--passport-cover), inset 0 0 0 11px oklch(0.82 0.16 85 / 0.45), 0 18px 40px -24px oklch(0 0 0 / 0.7);
+}
+.pp-page.pp-cover::before { display: none; }
+.pp-cover .pp-foot { border-color: oklch(0.82 0.16 85 / 0.3); }
+
+.pp-seal {
+  width: 92px; height: 92px; flex: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border: 3px double var(--primary); border-radius: 50%;
+  color: var(--primary); font-family: var(--font-mono); font-size: 9px; line-height: 1.4; letter-spacing: 0.2em;
+}
+.pp-seal span:first-child { font-size: 20px; font-weight: 600; letter-spacing: 0.05em; }
+.pp-grade {
+  display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%;
+  border: 3px double var(--passport-cover-deep); color: var(--passport-cover-deep);
+  font-family: var(--font-display); font-size: 30px; font-weight: 700; line-height: 1;
+}
+.pp-mrz {
+  margin-top: 18px; padding: 10px 12px; border-radius: 4px;
+  background: color-mix(in oklab, var(--passport-rule) 25%, transparent);
+  font-family: var(--font-mono); font-size: 11px; line-height: 1.6; letter-spacing: 0.12em;
+  white-space: nowrap; overflow: hidden;
+}
+
+/* Wide enough for two pages: join them into an open booklet with a stitched fold. */
+@container (min-width: 920px) {
+  .pp-spread { gap: 0; width: auto; filter: drop-shadow(0 30px 40px oklch(0 0 0 / 0.45)); }
+  .pp-spread > .pp-page { box-shadow: none; }
+  .pp-spread > .pp-page:first-child { border-radius: 14px 3px 3px 14px; border-right: 0; background-color: var(--passport-paper); }
+  .pp-spread > .pp-page:last-child { border-radius: 3px 14px 14px 3px; }
+  .pp-spread > .pp-page:not(.pp-cover):first-child { box-shadow: inset -26px 0 26px -24px oklch(0 0 0 / 0.45); }
+  .pp-spread > .pp-page:not(.pp-cover):last-child { box-shadow: inset 26px 0 26px -24px oklch(0 0 0 / 0.45); }
+  .pp-spread > .pp-cover:first-child {
+    background-color: var(--passport-cover);
+    box-shadow: inset 0 0 0 10px var(--passport-cover), inset 0 0 0 11px oklch(0.82 0.16 85 / 0.45), inset -26px 0 26px -20px oklch(0 0 0 / 0.6);
+  }
+  .pp-spread::after {
+    content: ""; position: absolute; z-index: 2; top: 28px; bottom: 28px; left: 50%;
+    border-left: 2px dashed oklch(0.25 0.028 175 / 0.3); pointer-events: none;
+  }
+}
