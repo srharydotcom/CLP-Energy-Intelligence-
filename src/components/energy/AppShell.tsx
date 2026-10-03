@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/profile";
 import { cn } from "@/lib/utils";
 import { Tour } from "./Tour";
+import { useAreaUnit } from "@/lib/units";
+
 
 const HOUSEHOLD_NAV = [
   { to: "/dashboard", label: "Dashboard", icon: Gauge },
@@ -46,6 +48,17 @@ function Shell({ children }: { children: ReactNode }) {
     navigate({ to: "/auth", replace: true });
   };
 
+  const area = useAreaUnit();
+  const unitSwitch = (
+    <div className="grid grid-cols-2 gap-1 rounded-md bg-sidebar-accent/50 p-1 text-xs" aria-label="Area unit">
+      {(["m2", "sqft"] as const).map((u) => (
+        <button key={u} onClick={() => area.setUnit(u)}
+          className={cn("rounded px-2 py-1 transition-colors", area.unit === u ? "bg-background font-medium text-foreground" : "text-sidebar-foreground/70 hover:text-sidebar-foreground")}>
+          {u === "m2" ? "m²" : "sq ft"}
+        </button>
+      ))}
+    </div>
+  );
   const modeSwitch = (
     <div data-tour="mode-switch" className="grid grid-cols-2 gap-1 rounded-md bg-sidebar-accent/50 p-1 text-xs">
       {(["household", "business"] as const).map((m) => (
@@ -66,7 +79,7 @@ function Shell({ children }: { children: ReactNode }) {
             <span className="font-display text-sm font-semibold leading-tight text-sidebar-foreground">Energy<br />Intelligence</span>
           </div>
         </div>
-        <div className="mb-4">{modeSwitch}</div>
+        <div className="mb-4 space-y-2">{modeSwitch}{unitSwitch}</div>
         <nav className="space-y-0.5">
           {nav.map(({ to, label, icon: Icon }) => (
             <Link key={to} to={to} data-tour={`nav-${to}`}
@@ -87,6 +100,7 @@ function Shell({ children }: { children: ReactNode }) {
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 border-b p-2 md:hidden">
           <div className="w-40 shrink-0">{modeSwitch}</div>
+          <div className="w-28 shrink-0">{unitSwitch}</div>
           <nav className="flex gap-1 overflow-x-auto">
             {nav.map(({ to, label }) => (
               <Link key={to} to={to} className="whitespace-nowrap rounded px-2.5 py-1.5 text-xs text-muted-foreground" activeProps={{ className: "!bg-accent !text-foreground" }}>{label}</Link>

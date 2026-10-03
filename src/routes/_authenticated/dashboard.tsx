@@ -1,3 +1,4 @@
+import { useAreaUnit } from "@/lib/units";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -32,6 +33,7 @@ function Dashboard() {
 }
 
 function HouseholdDashboard({ name }: { name: string | null }) {
+  const u = useAreaUnit();
   const { homes, isLoading, create, remove, setActiveId } = useHomes();
   const tariffs = useQuery(tariffsQuery);
   const [toDelete, setToDelete] = useState<SavedHome | null>(null);
@@ -62,7 +64,7 @@ function HouseholdDashboard({ name }: { name: string | null }) {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="truncate font-display text-lg font-semibold">{h.profile.name}</div>
-                  <div className="text-xs text-muted-foreground">{h.profile.district || "Hong Kong"} · {num(h.profile.areaM2)} m² · {h.profile.occupants} people</div>
+                  <div className="text-xs text-muted-foreground">{h.profile.district || "Hong Kong"} · {u.show(h.profile.areaM2)} {u.label} · {h.profile.occupants} people</div>
                 </div>
                 {r ? <span className={`grid size-9 shrink-0 place-items-center rounded font-mono font-bold text-background ${GRADE_BG[r.grade]}`}>{r.grade}</span>
                   : <span className="grid size-9 shrink-0 place-items-center rounded border border-dashed text-muted-foreground"><House className="size-4" /></span>}

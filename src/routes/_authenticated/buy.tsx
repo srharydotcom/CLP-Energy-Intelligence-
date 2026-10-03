@@ -1,3 +1,4 @@
+import { useAreaUnit } from "@/lib/units";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
@@ -62,6 +63,7 @@ function NumField({ label, value, onChange, step = 1, hint }: { label: string; v
 }
 
 function AddProductDialog({ category, onAdd }: { category: string; onAdd: (p: Product) => void }) {
+  const u = useAreaUnit();
   const [open, setOpen] = useState(false);
   const [f, setF] = useState({ brand: "", model: "", price: 8000, annual_kwh: 800, lifetime_years: 10, maintenance_per_year: 200, capacity: 3.5, shift_kwh: 0 });
   const meta = USAGE_BASIS[category] ?? USAGE_BASIS["Other"]!;
@@ -84,7 +86,7 @@ function AddProductDialog({ category, onAdd }: { category: string; onAdd: (p: Pr
           <div><Label className="text-xs text-muted-foreground">Brand</Label><Input className="mt-1 h-9" value={f.brand} onChange={(e) => set("brand")(e.target.value)} /></div>
           <div><Label className="text-xs text-muted-foreground">Model</Label><Input className="mt-1 h-9" value={f.model} onChange={(e) => set("model")(e.target.value)} /></div>
           <NumField label="Purchase price (HK$)" value={f.price} onChange={set("price")} />
-          <NumField label="Rated kWh per year" value={f.annual_kwh} onChange={set("annual_kwh")} hint={`At ${meta.basis === "area" ? `${meta.ref} m², ${AC_REF_HOURS} h/day` : meta.basis === "occupants" ? `${meta.ref} people` : meta.basis === "km" ? `${num(meta.ref)} km/yr` : "standard use"}`} />
+          <NumField label="Rated kWh per year" value={f.annual_kwh} onChange={set("annual_kwh")} hint={`At ${meta.basis === "area" ? `${u.show(meta.ref)} ${u.label}, ${AC_REF_HOURS} h/day` : meta.basis === "occupants" ? `${meta.ref} people` : meta.basis === "km" ? `${num(meta.ref)} km/yr` : "standard use"}`} />
           <NumField label="Expected lifespan (yrs)" value={f.lifetime_years} onChange={set("lifetime_years")} />
           <NumField label="Maintenance per year (HK$)" value={f.maintenance_per_year} onChange={set("maintenance_per_year")} />
           {meta.unit && <NumField label={`Capacity (${meta.unit})`} value={f.capacity} step={0.1} onChange={set("capacity")} />}
@@ -102,7 +104,7 @@ const BUDGET: ReqField = { key: "budget", label: "Most you'd spend (HK$)", hint:
 /** What we need to know before recommending, per type. Each answer changes the result. */
 const REQUIREMENTS: Record<string, ReqField[]> = {
   "Air conditioner": [
-    { key: "roomM2", label: "Size of the room to cool (m²)", hint: "Sets the cooling power you need" },
+    { key: "roomM2", label: "Size of the room to cool", hint: "Sets the cooling power you need" },
     { key: "acHoursPerDay", label: "Hours it runs a day in summer", hint: "Drives the yearly running cost" }, BUDGET],
   Refrigerator: [{ key: "occupants", label: "People it feeds", hint: "Sets the fridge size you need" }, BUDGET],
   "Water heater": [{ key: "occupants", label: "People showering daily", hint: "Sets tank size and hot-water use" }, BUDGET],
@@ -116,9 +118,9 @@ const REQUIREMENTS: Record<string, ReqField[]> = {
     { key: "minKg", label: "Smallest drum you'd accept (kg)", hint: "Hides smaller machines", optional: true }, BUDGET],
   Dryer: [{ key: "loadsPerWeek", label: "Loads dried per week", hint: "Drives running cost" }, BUDGET],
   Dishwasher: [{ key: "loadsPerWeek", label: "Cycles per week", hint: "Drives running cost" }, BUDGET],
-  Dehumidifier: [{ key: "areaM2", label: "Area to keep dry (m²)", hint: "Drives how hard it works" }, BUDGET],
+  Dehumidifier: [{ key: "areaM2", label: "Area to keep dry", hint: "Drives how hard it works" }, BUDGET],
   Cooktop: [{ key: "mealsPerDay", label: "Cooked meals a day", hint: "Drives running cost" }, BUDGET],
-  Lighting: [{ key: "areaM2", label: "Area to light (m²)", hint: "Sets how many bulbs you need" }, BUDGET],
+  Lighting: [{ key: "areaM2", label: "Area to light", hint: "Sets how many bulbs you need" }, BUDGET],
   Other: [{ key: "hoursPerDay", label: "Hours it's on a day", hint: "Drives running cost" }, BUDGET],
 };
 const REF_USE: Partial<Record<string, { key: ReqKey; ref: number }>> = {
@@ -128,6 +130,8 @@ const REF_USE: Partial<Record<string, { key: ReqKey; ref: number }>> = {
 const MIN_SIZE: Partial<Record<string, ReqKey>> = { TV: "screenIn", "Washing machine": "minKg" };
 
 function BuyPage() {
+  const u = useAreaUnit();
+  const isArea = (k: ReqKey) => k === "roomM2" || k === "areaM2";
   const products = useQuery(productsQuery);
   const tariffs = useQuery(tariffsQuery);
   const [category, setCategory] = useState<string>();
@@ -216,9 +220,9 @@ function BuyPage() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {fields.map((f) => (
           <div key={f.key}>
-            <Label className="text-xs text-muted-foreground">{f.label}{f.optional ? " (optional)" : ""}</Label>
-            <Input type="number" min={0} step={f.step ?? 1} className="mt-1 h-9 font-mono" value={req[f.key] ?? ""} placeholder="—"
-              onChange={(e) => setReq({ ...req, [f.key]: e.target.value === "" ? undefined : Number(e.target.value) })} />
+            <Label className="text-xs text-muted-foreground">{f.label}{isArea(f.key) ? ` (${u.label})` : ""}{f.optional ? " (optional)" : ""}</Label>
+            <Input type="number" min={0} step={f.step ?? 1} className="mt-1 h-9 font-mono" value={req[f.key] == null ? "" : isArea(f.key) ? u.show(req[f.key]!) : req[f.key]} placeholder="—"
+              onChange={(e) => setReq({ ...req, [f.key]: e.target.value === "" ? undefined : isArea(f.key) ? u.toM2(Number(e.target.value)) : Number(e.target.value) })} />
             <div className="mt-1 text-[11px] text-muted-foreground">{f.hint}</div>
           </div>
         ))}
@@ -335,7 +339,7 @@ function BuyPage() {
           <div className="rounded-lg border bg-card p-4 text-xs text-muted-foreground space-y-1.5">
             <div className="font-mono text-[11px] uppercase tracking-widest">How we estimate</div>
             <p>Rated kWh is scaled to your home: AC by area cooled and hours of use, fridges and water heaters by people, EVs by distance.</p>
-            <p>Sizing: AC ≈ 0.18 kW per m² of room; fridge ≈ 120 L + 80 L per person; storage heater ≈ 30 L per person. Undersized ACs use 25% more energy.</p>
+            <p>Sizing: AC ≈ {u.unit === "sqft" ? "0.017 kW per sq ft" : "0.18 kW per m²"} of room; fridge ≈ 120 L + 80 L per person; storage heater ≈ 30 L per person. Undersized ACs use 25% more energy.</p>
             <p>Cost to own = purchase (with replacements inside the horizon) + energy + upkeep, discounted to today. Break-even uses cumulative spend.</p>
             <p>Electricity: {hkd(effectiveRate(tariff, a), 2)}/kWh on {tariff.name}.</p>
           </div>

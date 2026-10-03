@@ -28,6 +28,7 @@ const BUSINESS_STEPS: TourStep[] = [
   { target: "nav-/help", title: "Help", body: "Read the full guide or replay this tour any time." },
 ];
 
+let autoStarted = false;
 export function startTour() { window.dispatchEvent(new Event("clp:start-tour")); }
 
 export function Tour({ mode }: { mode: "household" | "business" }) {
@@ -38,9 +39,10 @@ export function Tour({ mode }: { mode: "household" | "business" }) {
   const [rect, setRect] = useState<DOMRect | null>(null);
   const steps = mode === "business" ? BUSINESS_STEPS : HOUSEHOLD_STEPS;
 
+  // Auto-start once per session for new users; never restart after it's been closed.
   useEffect(() => {
-    if (profile && !profile.tour_done && i === null) setI(0);
-  }, [profile, i]);
+    if (profile && !profile.tour_done && !autoStarted) { autoStarted = true; setI(0); }
+  }, [profile]);
   useEffect(() => {
     const h = () => setI(0);
     window.addEventListener("clp:start-tour", h);

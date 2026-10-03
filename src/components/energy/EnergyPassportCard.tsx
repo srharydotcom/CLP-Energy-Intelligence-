@@ -1,4 +1,6 @@
 import { cn } from "@/lib/utils";
+import { useAreaUnit } from "@/lib/units";
+
 import { hkd, num, MONTHS, type PassportMetrics } from "@/lib/energy";
 
 const GRADES = ["A", "B", "C", "D", "E"] as const;
@@ -11,6 +13,7 @@ const gradeColor: Record<string, string> = {
 };
 
 export function EnergyPassportCard({ code, name, sub, m }: { code: string; name: string; sub: string; m: PassportMetrics }) {
+  const u = useAreaUnit();
   return (
     <div className="rounded-lg border bg-card">
       <div className="flex items-start justify-between border-b p-5">
@@ -45,7 +48,7 @@ export function EnergyPassportCard({ code, name, sub, m }: { code: string; name:
             ["Annual use", `${num(m.annualKwh)} kWh`],
             ["Annual cost", hkd(m.annualCost)],
             ["vs. similar homes", `${m.vsPeerPct >= 0 ? "+" : ""}${num(m.vsPeerPct, 1)}%`],
-            ["Intensity", `${num(m.kwhPerM2, 1)} kWh/m²`],
+            ["Intensity", `${num(u.perArea(m.kwhPerM2), u.unit === "sqft" ? 2 : 1)} kWh/${u.label}`],
             ["Per person", `${num(m.kwhPerPerson)} kWh`],
             ["Emissions", `${num(m.co2Tonnes, 2)} tCO₂e`],
             ["Highest month", MONTHS[m.peakMonth]],

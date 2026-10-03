@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Plus, Trash2, PackagePlus, Sparkles, ChevronDown } from "lucide-react";
+import { useAreaUnit } from "@/lib/units";
 import { PageHeader } from "@/components/energy/AppShell";
 import { EnergyCostCard } from "@/components/energy/MetricCards";
 import { AssumptionPanel } from "@/components/energy/AssumptionPanel";
@@ -81,6 +82,7 @@ function MyHomePage() {
 }
 
 function HomeEditor({ home, update }: { home: SavedHome; update: (fn: (h: SavedHome) => SavedHome) => void }) {
+  const u = useAreaUnit();
   const catalog = useQuery(applianceCatalogQuery);
   const tariffs = useQuery(tariffsQuery);
   const products = useQuery(productsQuery);
@@ -132,7 +134,7 @@ function HomeEditor({ home, update }: { home: SavedHome; update: (fn: (h: SavedH
               <div className="space-y-1"><Label className="text-xs text-muted-foreground">Name</Label><Input value={p.name} onChange={(e) => setProfile({ name: e.target.value })} /></div>
               <div className="space-y-1"><Label className="text-xs text-muted-foreground">District</Label><Input value={p.district} placeholder="e.g. Sha Tin" onChange={(e) => setProfile({ district: e.target.value })} /></div>
               <Choice label="Type of home" value={p.propertyType} onChange={(v) => setProfile({ propertyType: v })} options={[["flat", "Flat / apartment"], ["house", "House"], ["village", "Village house"]]} />
-              <NumField label="Size" suffix="m²" value={p.areaM2} onChange={(n) => setProfile({ areaM2: n })} />
+              <NumField label="Size" suffix={u.label} value={u.show(p.areaM2)} onChange={(n) => setProfile({ areaM2: u.toM2(n) })} />
               <NumField label="People living here" value={p.occupants} onChange={(n) => setProfile({ occupants: Math.round(n) })} />
               <NumField label="Bedrooms" value={p.bedrooms} onChange={(n) => setProfile({ bedrooms: Math.round(n) })} />
             </div>

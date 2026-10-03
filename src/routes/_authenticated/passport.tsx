@@ -1,3 +1,4 @@
+import { useAreaUnit } from "@/lib/units";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
@@ -33,6 +34,7 @@ export const Route = createFileRoute("/_authenticated/passport")({
 const COOLING_WEIGHTS = [0.2, 0.2, 0.4, 0.8, 1.4, 1.8, 2, 2, 1.7, 1.1, 0.3, 0.1];
 
 function PassportPage() {
+  const u = useAreaUnit();
   const { homes, active, setActiveId, isLoading } = useHomes();
   const tariffs = useQuery(tariffsQuery);
   const a = DEFAULT_ASSUMPTIONS;
@@ -68,7 +70,7 @@ function PassportPage() {
     <>
       {header}
       <div className="space-y-5">
-        <EnergyPassportCard code={p.name.slice(0, 12).toUpperCase()} name={p.name} sub={`${p.district || "Hong Kong"} · ${num(p.areaM2)} m² · ${p.occupants} people`} m={m} />
+        <EnergyPassportCard code={p.name.slice(0, 12).toUpperCase()} name={p.name} sub={`${p.district || "Hong Kong"} · ${num(u.show(p.areaM2))} ${u.label} · ${p.occupants} people`} m={m} />
 
         <div className="grid gap-5 lg:grid-cols-2">
           <section className="rounded-lg border bg-card p-4">
@@ -81,7 +83,7 @@ function PassportPage() {
                 {num(s.totalKwh)} kWh × {hkd(rate, 2)} per kWh = <b>{hkd(s.totalCost)}</b> a year (about {hkd(s.totalCost / 12)} a month).
               </Step>
               <Step n={3} title="Compare with similar homes">
-                A typical home with {p.occupants} people and {num(p.areaM2)} m² uses about {num(PEER_BASE_KWH)} + {num(PEER_PER_PERSON_KWH)} × {p.occupants} people + {PEER_PER_M2_KWH} × {num(p.areaM2)} m² = <b>{num(r.peer)} kWh</b>. Yours is <b>{num(Math.abs(r.vsPeerPct))}% {r.vsPeerPct >= 0 ? "more" : "less"}</b>.
+                A typical home with {p.occupants} people and {num(u.show(p.areaM2))} {u.label} uses about {num(PEER_BASE_KWH)} + {num(PEER_PER_PERSON_KWH)} × {p.occupants} people + {num(u.perArea(PEER_PER_M2_KWH), 2)} × {num(u.show(p.areaM2))} {u.label} = <b>{num(r.peer)} kWh</b>. Yours is <b>{num(Math.abs(r.vsPeerPct))}% {r.vsPeerPct >= 0 ? "more" : "less"}</b>.
               </Step>
               <Step n={4} title="Give it a score">
                 Score = 70 − 1.2 × {num(r.vsPeerPct, 1)} = <b>{r.score}</b> (kept between 0 and 100). A is 80+, B 65+, C 50+, D 35+, E below. This home is <b>{r.grade}</b>.
