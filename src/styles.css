@@ -121,8 +121,7 @@
   --passport-ink: oklch(0.25 0.028 175);
   --passport-muted: oklch(0.49 0.025 170);
   --passport-rule: oklch(0.56 0.07 82 / 0.34);
-  --cursor-halo: oklch(0.85 0.18 88 / 0.32);
-  --cursor-surface: oklch(0.85 0.18 88 / 0.24);
+  --cursor-halo: oklch(0.85 0.18 88 / 0.10);
 }
 
 @layer base {
@@ -153,27 +152,20 @@
   .tactile:active { transform: scale(0.96); }
   button:not(:disabled), a { -webkit-tap-highlight-color: transparent; }
 
-  /* Warm moving light; reflected by the surface currently under the pointer. */
+  /* Soft ambient light that follows the pointer without changing element boundaries. */
   .cursor-glow {
     position: fixed;
     top: 0;
     left: 0;
     z-index: 30;
-    width: 440px;
-    height: 440px;
+    width: 340px;
+    height: 340px;
     border-radius: 50%;
-    background: radial-gradient(circle, var(--cursor-halo) 0%, color-mix(in oklch, var(--cursor-halo) 45%, transparent) 35%, transparent 72%);
+    background: radial-gradient(circle, var(--cursor-halo) 0%, transparent 72%);
     pointer-events: none;
     opacity: 0;
     transform: translate3d(-1000px, -1000px, 0);
     transition: opacity 240ms ease;
-  }
-  .cursor-lit:is(.bg-card, .bg-popover, .passport-sheet, .passport-cover, .passport-page, .passport-analysis, .passport-spread, section, header, aside) {
-    background-image: radial-gradient(360px circle at var(--cursor-local-x) var(--cursor-local-y), var(--cursor-surface), transparent 78%);
-    border-color: color-mix(in oklch, var(--primary) 48%, var(--border));
-  }
-  .cursor-lit:is(button, a, input, select, textarea, aside) {
-    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--primary) 55%, transparent), 0 0 32px -11px var(--primary);
   }
 
   /* Passport: a bound cover and an open, stamped record with numbered pages. */
@@ -317,5 +309,4 @@
 
 @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
   .cursor-glow { display: none; }
-  .cursor-lit { background-image: none !important; }
 }

@@ -19,4 +19,4 @@
 - All app pages live under `src/routes/_authenticated/`; `/` and `/auth` are the only public routes; why: sign-in is mandatory.
 - Household vs business mode comes from `profiles.user_type`; AppShell picks nav and runAnalysis picks plain vs expert language by module; why: households want simple explanations, businesses want detail.
 - The guided tour targets elements via `data-tour` attributes (`src/components/energy/Tour.tsx`); why: steps survive layout changes.
-- Cursor lighting is a client-only presentation layer mounted at the root and targets semantic surfaces; why: every screen shares the effect without coupling it to application state.
+- Cursor lighting is a client-only ambient layer mounted at the root and does not alter element surfaces; why: every screen shares a subtle effect without box outlines or coupling to application state.
