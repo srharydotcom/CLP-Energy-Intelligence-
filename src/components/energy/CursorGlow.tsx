@@ -20,7 +20,7 @@ export function CursorGlow() {
       frame = requestAnimationFrame(() => {
         light.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
         const target = document.elementFromPoint(x, y) as HTMLElement | null;
-        const overContent = target?.closest("button, a, input, select, textarea, [role='button'], [role='dialog'], .bg-card, .bg-popover, .passport-spread, .passport-page, .passport-analysis, table, img, svg, h1, h2, h3, h4, p") ?? null;
+        const overContent = target?.closest("button, a, input, select, textarea, label, [role='button'], [role='dialog'], .bg-card, .bg-popover, .passport-cover, .passport-sheet, .passport-page, .passport-analysis, table, img, svg, h1, h2, h3, h4, h5, p, ul, ol") ?? null;
         light.style.opacity = overContent ? "0" : "1";
         frame = 0;
       });
