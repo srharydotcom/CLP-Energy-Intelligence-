@@ -12,7 +12,6 @@ export function CursorGlow() {
     let frame = 0;
     let x = -1000;
     let y = -1000;
-    let surface: HTMLElement | null = null;
 
     const move = (event: PointerEvent) => {
       x = event.clientX;
@@ -21,24 +20,11 @@ export function CursorGlow() {
       frame = requestAnimationFrame(() => {
         light.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
         light.style.opacity = "1";
-        const next = (document.elementFromPoint(x, y) as HTMLElement | null)?.closest<HTMLElement>(
-          ".passport-page, .passport-analysis, .passport-sheet, .passport-cover, .bg-card, .bg-popover, header, section, aside, button, a, input, select, textarea",
-        ) ?? null;
-        if (surface && surface !== next) surface.classList.remove("cursor-lit");
-        surface = next;
-        if (surface) {
-          const bounds = surface.getBoundingClientRect();
-          surface.style.setProperty("--cursor-local-x", `${x - bounds.left}px`);
-          surface.style.setProperty("--cursor-local-y", `${y - bounds.top}px`);
-          surface.classList.add("cursor-lit");
-        }
         frame = 0;
       });
     };
     const leave = () => {
       light.style.opacity = "0";
-      surface?.classList.remove("cursor-lit");
-      surface = null;
     };
     window.addEventListener("pointermove", move, { passive: true });
     document.addEventListener("pointerleave", leave);
@@ -48,7 +34,6 @@ export function CursorGlow() {
       document.removeEventListener("pointerleave", leave);
       window.removeEventListener("blur", leave);
       if (frame) cancelAnimationFrame(frame);
-      surface?.classList.remove("cursor-lit");
     };
   }, []);
 
