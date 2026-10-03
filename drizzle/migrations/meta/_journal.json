@@ -8,6 +8,13 @@
       "when": 1791014313188,
       "tag": "0000_energy_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791015417062,
+      "tag": "0001_product_context",
+      "breakpoints": true
     }
   ]
 }
