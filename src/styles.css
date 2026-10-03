@@ -257,15 +257,14 @@
   .passport-analysis { background-color: var(--passport-paper); }
   .passport-analysis > .bg-card { padding: 0; border: 0; background: transparent; box-shadow: none; backdrop-filter: none; color: var(--passport-ink); }
   /* Four equally proportioned document panels, with overflow kept inside each panel. */
-  .passport-four-sections { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; max-width: 1050px; margin-inline: auto; }
-  .passport-four-sections > * { min-width: 0; min-height: 0; padding: 24px; }
+  .passport-four-sections { display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: 620px; gap: 20px; max-width: 1050px; margin-inline: auto; }
+  .passport-four-sections > * { min-width: 0; min-height: 0; padding: 24px; overflow: auto; scrollbar-color: var(--passport-rule) transparent; }
   .passport-analysis > .bg-card .text-muted-foreground { color: var(--passport-muted); }
   .passport-analysis > .bg-card .text-foreground { color: var(--passport-ink); }
 }
 
 @media (min-width: 900px) {
   .passport-four-sections { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 580px; }
-  .passport-four-sections > * { overflow: auto; scrollbar-color: var(--passport-rule) transparent; }
 }
 
 @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
