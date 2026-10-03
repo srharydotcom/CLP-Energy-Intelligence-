@@ -11,7 +11,6 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { AppShell } from "@/components/energy/AppShell";
-import { CursorGlow } from "@/components/energy/CursorGlow";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import appCss from "../styles.css?url";
@@ -136,7 +135,6 @@ function RootComponent() {
       <AppShell>
         <Outlet />
       </AppShell>
-      <CursorGlow />
       <Toaster theme="dark" position="bottom-right" />
     </QueryClientProvider>
   );
