@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { homeContext, useHomes } from "@/lib/my-home";
+import { homeContext, homeIsComplete, useHomes } from "@/lib/my-home";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { PageHeader } from "@/components/energy/AppShell";
 import { ProductComparisonTable } from "@/components/energy/ProductComparisonTable";
@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { homesQuery, productsQuery, tariffsQuery } from "@/lib/queries";
+import { productsQuery, tariffsQuery } from "@/lib/queries";
 import {
   AC_REF_HOURS, DEFAULT_ASSUMPTIONS, breakEvenYear, contextEconomics, effectiveRate, hkd, num, payback,
   type HouseholdContext, type Product,
@@ -99,18 +99,17 @@ function AddProductDialog({ category, onAdd }: { category: string; onAdd: (p: Pr
 function BuyPage() {
   const products = useQuery(productsQuery);
   const tariffs = useQuery(tariffsQuery);
-  const homes = useQuery(homesQuery);
-  const [category, setCategory] = useState("Air conditioner");
+  const [category, setCategory] = useState<string>();
   const [selected, setSelected] = useState<string>();
   const [custom, setCustom] = useState<Product[]>([]);
   const [a, setA] = useState(DEFAULT_ASSUMPTIONS);
-  const [homeId, setHomeId] = useState("home-1");
+  const [homeId, setHomeId] = useState("");
   const [tariffId, setTariffId] = useState<string>();
-  const [ctx, setCtx] = useState<HouseholdContext>({ areaM2: 68, roomM2: 18, occupants: 3, acHoursPerDay: 8, evKmPerYear: 12000 });
+  const [ctx, setCtx] = useState<HouseholdContext>({ areaM2: 0, roomM2: 0, occupants: 0, acHoursPerDay: 0, evKmPerYear: 0 });
 
   const myHomes = useHomes();
   useEffect(() => {
-    if (myHomes.active && homeId === "home-1") setHomeId(`mine:${myHomes.active.id}`);
+    if (myHomes.active && !homeId) setHomeId(`mine:${myHomes.active.id}`);
   }, [myHomes.active, homeId]);
   const mine = homeId.startsWith("mine:") ? myHomes.homes.find((h) => `mine:${h.id}` === homeId) : undefined;
   useEffect(() => {
@@ -119,13 +118,6 @@ function BuyPage() {
       setTariffId(mine.profile.tariffId);
     }
   }, [mine]);
-  const home = homes.data?.find((h) => h.id === homeId);
-  useEffect(() => {
-    if (home) {
-      setCtx((c) => ({ ...c, areaM2: Number(home.floor_area_m2), occupants: home.occupants }));
-      setTariffId(home.tariff_id ?? "res-std");
-    }
-  }, [home]);
 
   const tariff = tariffs.data?.find((t) => t.id === (tariffId ?? "res-std"));
   const all = [...(products.data ?? []), ...custom];
@@ -142,14 +134,39 @@ function BuyPage() {
   const baseline = rows.reduce<(typeof rows)[number] | undefined>((b, r) => (b && Number(b.product.price) <= Number(r.product.price) ? b : r), undefined);
   const cand = rows.find((r) => r.product.id === selected) ?? best;
 
+  const tabs = (
+    <Tabs value={category ?? ""} onValueChange={(c) => { setCategory(c); setSelected(undefined); }}>
+      <TabsList className="h-auto flex-wrap">{[...categories, ...(categories.includes("Other") ? [] : ["Other"])].map((c) => <TabsTrigger key={c} value={c}>{c === "Other" ? "Something else" : c}</TabsTrigger>)}</TabsList>
+    </Tabs>
+  );
   const header = <PageHeader kicker="Module 02" title="Should I Buy This?" sub="Cost a product in your own home — its size, your household and your tariff — and compare its total cost of ownership with the alternatives." />;
-  if (!tariff || products.isLoading) return <>{header}<Skeleton className="h-96" /></>;
+  if (!tariff || products.isLoading || myHomes.isLoading) return <>{header}<Skeleton className="h-96" /></>;
+  if (!homeIsComplete(mine)) return (
+    <>{header}
+      <div className="rounded-lg border border-dashed p-10 text-center">
+        <div className="font-display text-lg font-semibold">First, tell us about your home</div>
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">We only give advice once we know how big your home is, how many people live there and which appliances you already have — otherwise any recommendation would be a guess.</p>
+        <Button asChild className="mt-5"><Link to="/home">Set up my home</Link></Button>
+      </div>
+    </>
+  );
+  if (!category) return (
+    <>{header}
+      <div className="rounded-lg border bg-card p-6">
+        <div className="mb-1 font-display text-lg font-semibold">What are you thinking of buying?</div>
+        <p className="mb-4 text-sm text-muted-foreground">Pick a type and we&apos;ll compare the options for {mine!.profile.name}.</p>
+        <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-4">
+          {[...categories, ...(categories.includes("Other") ? [] : ["Other"])].map((c) => (
+            <Button key={c} variant="outline" className="h-12 justify-start" onClick={() => setCategory(c)}>{c === "Other" ? "Something else" : c}</Button>
+          ))}
+        </div>
+      </div>
+    </>
+  );
   if (!cand || !baseline || !best) return (
     <>{header}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <Tabs value={category} onValueChange={(c) => { setCategory(c); setSelected(undefined); }}>
-          <TabsList className="flex-wrap">{[...categories, ...(categories.includes("Other") ? [] : ["Other"])].map((c) => <TabsTrigger key={c} value={c}>{c === "Other" ? "Something else" : c}</TabsTrigger>)}</TabsList>
-        </Tabs>
+        {tabs}
       </div>
       <div className="rounded-lg border border-dashed p-10 text-center">
         <p className="mb-4 text-muted-foreground">Nothing to compare here yet. Add the products you're choosing between — at least two.</p>
@@ -173,7 +190,6 @@ function BuyPage() {
             <SelectTrigger className="mt-1 h-9"><SelectValue /></SelectTrigger>
             <SelectContent>
               {myHomes.homes.map((h) => <SelectItem key={h.id} value={`mine:${h.id}`}>{h.profile.name}</SelectItem>)}
-              {homes.data?.map((h) => <SelectItem key={h.id} value={h.id}>Example: {h.name}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
@@ -191,9 +207,7 @@ function BuyPage() {
       </div>
 
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <Tabs value={category} onValueChange={(c) => { setCategory(c); setSelected(undefined); }}>
-          <TabsList className="flex-wrap">{[...categories, ...(categories.includes("Other") ? [] : ["Other"])].map((c) => <TabsTrigger key={c} value={c}>{c === "Other" ? "Something else" : c}</TabsTrigger>)}</TabsList>
-        </Tabs>
+        {tabs}
         {<AddProductDialog category={category} onAdd={(p) => { setCustom((c) => [...c, p]); setSelected(p.id); }} />}
       </div>
 
@@ -233,7 +247,7 @@ function BuyPage() {
             metrics={{
               category,
               tariff: tariff.name,
-              household: { passport: mine ? mine.profile.name : home?.name, ...ctx, peer_median_kwh: home ? Number(home.peer_median_kwh) : null },
+              household: { passport: mine?.profile.name, ...ctx, window_facing: mine?.profile.windowFacing, owned_appliances: mine?.appliances.length },
               horizon_years: H,
               best_choice: best.product.id,
               candidate: { ...cand.product, size_fit: cand.fit, required_capacity: cand.required, usage_factor: cand.usageFactor, annual_kwh_in_home: cand.annualKwh, annual_cost: cand.annualCost, lifetime_cost_pv: cand.lifetimeCost, horizon_tco_pv: cand.horizonTco, lifetime_co2_kg: cand.lifetimeCo2Kg, shift_saving: cand.annualShiftSaving },

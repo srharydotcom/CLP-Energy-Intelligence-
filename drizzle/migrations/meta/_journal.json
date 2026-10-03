@@ -36,6 +36,13 @@
       "when": 1791018781418,
       "tag": "0004_accounts_and_homes",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791023692635,
+      "tag": "0005_real_hk_prices",
+      "breakpoints": true
     }
   ]
 }
