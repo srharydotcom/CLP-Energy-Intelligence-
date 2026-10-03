@@ -1,36 +1,20 @@
 import { useAreaUnit } from "@/lib/units";
 import { createFileRoute } from "@tanstack/react-router";
-import { useAreaUnit } from "@/lib/units";
 import { useQuery } from "@tanstack/react-query";
-import { useAreaUnit } from "@/lib/units";
 import { useMemo, useState } from "react";
-import { useAreaUnit } from "@/lib/units";
 import { Plus, Trash2, CheckCircle2, XCircle } from "lucide-react";
-import { useAreaUnit } from "@/lib/units";
 import { PageHeader } from "@/components/energy/AppShell";
-import { useAreaUnit } from "@/lib/units";
 import { AssumptionPanel } from "@/components/energy/AssumptionPanel";
-import { useAreaUnit } from "@/lib/units";
 import { AIAnalysisPanel } from "@/components/energy/AIFindingCard";
-import { useAreaUnit } from "@/lib/units";
 import { Button } from "@/components/ui/button";
-import { useAreaUnit } from "@/lib/units";
 import { Input } from "@/components/ui/input";
-import { useAreaUnit } from "@/lib/units";
 import { Label } from "@/components/ui/label";
-import { useAreaUnit } from "@/lib/units";
 import { Switch } from "@/components/ui/switch";
-import { useAreaUnit } from "@/lib/units";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAreaUnit } from "@/lib/units";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAreaUnit } from "@/lib/units";
 import { cn } from "@/lib/utils";
-import { useAreaUnit } from "@/lib/units";
 import { archetypesQuery, measuresQuery } from "@/lib/queries";
-import { useAreaUnit } from "@/lib/units";
 import { DEFAULT_ASSUMPTIONS, hkd, num } from "@/lib/energy";
-import { useAreaUnit } from "@/lib/units";
 import { WEATHER, defaultInputs, evaluateMeasures, sensitivity, type BuildingInputs, type Weather } from "@/lib/buildings";
 
 export const Route = createFileRoute("/_authenticated/buildings")({

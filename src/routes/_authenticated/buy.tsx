@@ -1,40 +1,22 @@
 import { useAreaUnit } from "@/lib/units";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useAreaUnit } from "@/lib/units";
 import { useQuery } from "@tanstack/react-query";
-import { useAreaUnit } from "@/lib/units";
 import { useEffect, useMemo, useState } from "react";
-import { useAreaUnit } from "@/lib/units";
 import { homeContext, homeIsComplete, useHomes } from "@/lib/my-home";
-import { useAreaUnit } from "@/lib/units";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useAreaUnit } from "@/lib/units";
 import { PageHeader } from "@/components/energy/AppShell";
-import { useAreaUnit } from "@/lib/units";
 import { ProductComparisonTable } from "@/components/energy/ProductComparisonTable";
-import { useAreaUnit } from "@/lib/units";
 import { EnergyCostCard, LifetimeCostCard, PaybackCard, SavingsCard } from "@/components/energy/MetricCards";
-import { useAreaUnit } from "@/lib/units";
 import { AssumptionPanel } from "@/components/energy/AssumptionPanel";
-import { useAreaUnit } from "@/lib/units";
 import { AIAnalysisPanel } from "@/components/energy/AIFindingCard";
-import { useAreaUnit } from "@/lib/units";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAreaUnit } from "@/lib/units";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAreaUnit } from "@/lib/units";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAreaUnit } from "@/lib/units";
 import { Input } from "@/components/ui/input";
-import { useAreaUnit } from "@/lib/units";
 import { Label } from "@/components/ui/label";
-import { useAreaUnit } from "@/lib/units";
 import { Button } from "@/components/ui/button";
-import { useAreaUnit } from "@/lib/units";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useAreaUnit } from "@/lib/units";
 import { productsQuery, tariffsQuery } from "@/lib/queries";
-import { useAreaUnit } from "@/lib/units";
 import {
   AC_REF_HOURS, DEFAULT_ASSUMPTIONS, breakEvenYear, contextEconomics, effectiveRate, hkd, num, payback,
   type HouseholdContext, type Product,

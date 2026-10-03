@@ -1,26 +1,15 @@
 import { useAreaUnit } from "@/lib/units";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useAreaUnit } from "@/lib/units";
 import { useQuery } from "@tanstack/react-query";
-import { useAreaUnit } from "@/lib/units";
 import { useState } from "react";
-import { useAreaUnit } from "@/lib/units";
 import { ArrowRight, IdCard, ShoppingCart, Building2, GitBranch, Plus, Trash2, House } from "lucide-react";
-import { useAreaUnit } from "@/lib/units";
 import { PageHeader } from "@/components/energy/AppShell";
-import { useAreaUnit } from "@/lib/units";
 import { Button } from "@/components/ui/button";
-import { useAreaUnit } from "@/lib/units";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAreaUnit } from "@/lib/units";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useAreaUnit } from "@/lib/units";
 import { homesQuery, optionsQuery, sitesQuery, tariffsQuery, productsQuery } from "@/lib/queries";
-import { useAreaUnit } from "@/lib/units";
 import { DEFAULT_ASSUMPTIONS, asArray, hkd, inventoryPassport, num, passportMetrics, procurementResult } from "@/lib/energy";
-import { useAreaUnit } from "@/lib/units";
 import { useHomes, type SavedHome } from "@/lib/my-home";
-import { useAreaUnit } from "@/lib/units";
 import { useProfile } from "@/lib/profile";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({

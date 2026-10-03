@@ -1,28 +1,16 @@
 import { useAreaUnit } from "@/lib/units";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useAreaUnit } from "@/lib/units";
 import { useQuery } from "@tanstack/react-query";
-import { useAreaUnit } from "@/lib/units";
 import { useMemo } from "react";
-import { useAreaUnit } from "@/lib/units";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { useAreaUnit } from "@/lib/units";
 import { PageHeader } from "@/components/energy/AppShell";
-import { useAreaUnit } from "@/lib/units";
 import { EnergyPassportCard } from "@/components/energy/EnergyPassportCard";
-import { useAreaUnit } from "@/lib/units";
 import { AIAnalysisPanel } from "@/components/energy/AIFindingCard";
-import { useAreaUnit } from "@/lib/units";
 import { Button } from "@/components/ui/button";
-import { useAreaUnit } from "@/lib/units";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAreaUnit } from "@/lib/units";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAreaUnit } from "@/lib/units";
 import { tariffsQuery } from "@/lib/queries";
-import { useAreaUnit } from "@/lib/units";
 import { END_USE_LABEL, useHomes } from "@/lib/my-home";
-import { useAreaUnit } from "@/lib/units";
 import {
   DEFAULT_ASSUMPTIONS, MONTHS, PEER_BASE_KWH, PEER_PER_M2_KWH, PEER_PER_PERSON_KWH, effectiveRate, hkd, inventoryPassport, num,
   type PassportMetrics,
