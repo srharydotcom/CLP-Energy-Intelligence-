@@ -15,8 +15,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Skeleton } from "@/components/ui/skeleton";
 import { applianceCatalogQuery, productsQuery, tariffsQuery } from "@/lib/queries";
-import { DEFAULT_ASSUMPTIONS, effectiveRate, hkd, inventorySummary, num, upgradeSuggestions, type HouseholdContext, type OwnedAppliance } from "@/lib/energy";
-import { useHomes, type MyHomeProfile, type SavedHome } from "@/lib/my-home";
+import { DEFAULT_ASSUMPTIONS, effectiveRate, hkd, inventorySummary, num, upgradeSuggestions, type OwnedAppliance } from "@/lib/energy";
+import { END_USE_LABEL, homeContext, useHomes, type MyHomeProfile, type SavedHome } from "@/lib/my-home";
 
 export const Route = createFileRoute("/_authenticated/home")({
   head: () => ({
@@ -31,11 +31,6 @@ export const Route = createFileRoute("/_authenticated/home")({
   }),
   component: MyHomePage,
 });
-
-export const END_USE_LABEL: Record<string, string> = {
-  cooling: "Cooling & air", refrigeration: "Fridge & freezer", water_heating: "Hot water", laundry: "Laundry",
-  cooking: "Cooking", electronics: "TV & electronics", lighting: "Lighting", ev: "Car charging", other: "Other",
-};
 
 const MISC_CATEGORIES = ["Kitchen", "Electronics", "Personal care", "Garden & outdoor", "Hobby & tools", "Health", "Pets & aquarium", "Other"];
 
@@ -58,10 +53,6 @@ function Choice<T extends string>({ label, value, onChange, options }: { label: 
       </Select>
     </div>
   );
-}
-
-export function homeContext(p: MyHomeProfile): HouseholdContext {
-  return { areaM2: p.areaM2, roomM2: Math.max(10, Math.round(p.areaM2 / (p.bedrooms + 1))), occupants: p.occupants, acHoursPerDay: p.acHoursPerDay, evKmPerYear: p.evKmPerYear };
 }
 
 function MyHomePage() {

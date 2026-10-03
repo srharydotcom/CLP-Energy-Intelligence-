@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { OwnedAppliance } from "./energy";
+import type { HouseholdContext, OwnedAppliance } from "./energy";
 
 export interface MyHomeProfile {
   name: string;
@@ -94,3 +94,14 @@ export function useHomes() {
 
   return { homes, active, activeId: active?.id ?? null, setActiveId, isLoading: q.isLoading, create, remove, update };
 }
+
+export const END_USE_LABEL: Record<string, string> = {
+  cooling: "Cooling & air", refrigeration: "Fridge & freezer", water_heating: "Hot water", laundry: "Laundry",
+  cooking: "Cooking", electronics: "TV & electronics", lighting: "Lighting", ev: "Car charging", other: "Other",
+};
+
+
+export function homeContext(p: MyHomeProfile): HouseholdContext {
+  return { areaM2: p.areaM2, roomM2: Math.max(10, Math.round(p.areaM2 / (p.bedrooms + 1))), occupants: p.occupants, acHoursPerDay: p.acHoursPerDay, evKmPerYear: p.evKmPerYear };
+}
+

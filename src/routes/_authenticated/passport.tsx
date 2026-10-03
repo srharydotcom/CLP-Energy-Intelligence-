@@ -9,12 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { tariffsQuery } from "@/lib/queries";
-import { useHomes } from "@/lib/my-home";
+import { END_USE_LABEL, useHomes } from "@/lib/my-home";
 import {
   DEFAULT_ASSUMPTIONS, MONTHS, PEER_BASE_KWH, PEER_PER_M2_KWH, PEER_PER_PERSON_KWH, effectiveRate, hkd, inventoryPassport, num,
   type PassportMetrics,
 } from "@/lib/energy";
-import { END_USE_LABEL } from "./home";
 
 export const Route = createFileRoute("/_authenticated/passport")({
   head: () => ({
