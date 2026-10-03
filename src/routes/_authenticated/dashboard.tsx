@@ -121,7 +121,7 @@ function HouseholdDashboard({ name }: { name: string | null }) {
 
 function Tile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex h-full flex-col justify-center rounded-2xl border bg-card p-4">
+    <div className="flex h-full flex-col justify-center rounded-2xl border bg-card p-4 md:row-span-2">
       <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">{label}</div>
       <div className="mt-1 font-mono text-2xl font-semibold tracking-tight tabular-nums">{value}</div>
     </div>
