@@ -41,6 +41,120 @@ export type Database = {
         }
         Relationships: []
       }
+      appliance_catalog: {
+        Row: {
+          category: string
+          default_days_per_year: number
+          default_hours_per_day: number
+          end_use: string
+          id: string
+          name: string
+          standby_watts: number
+          watts: number
+        }
+        Insert: {
+          category: string
+          default_days_per_year?: number
+          default_hours_per_day: number
+          end_use: string
+          id: string
+          name: string
+          standby_watts?: number
+          watts: number
+        }
+        Update: {
+          category?: string
+          default_days_per_year?: number
+          default_hours_per_day?: number
+          end_use?: string
+          id?: string
+          name?: string
+          standby_watts?: number
+          watts?: number
+        }
+        Relationships: []
+      }
+      building_archetypes: {
+        Row: {
+          days_per_week: number
+          default_area_m2: number
+          end_use_share: Json
+          hours_per_day: number
+          id: string
+          kwh_per_m2: number
+          name: string
+          occupancy_per_1000m2: number
+          peak_w_per_m2: number
+          roof_ratio: number
+        }
+        Insert: {
+          days_per_week: number
+          default_area_m2: number
+          end_use_share: Json
+          hours_per_day: number
+          id: string
+          kwh_per_m2: number
+          name: string
+          occupancy_per_1000m2: number
+          peak_w_per_m2: number
+          roof_ratio: number
+        }
+        Update: {
+          days_per_week?: number
+          default_area_m2?: number
+          end_use_share?: Json
+          hours_per_day?: number
+          id?: string
+          kwh_per_m2?: number
+          name?: string
+          occupancy_per_1000m2?: number
+          peak_w_per_m2?: number
+          roof_ratio?: number
+        }
+        Relationships: []
+      }
+      building_measures: {
+        Row: {
+          capex_rate: number
+          capex_unit: string
+          category: string
+          description: string
+          end_use: string | null
+          id: string
+          install_weeks: number
+          lifetime_years: number
+          maint_pct_capex: number
+          name: string
+          savings_pct: number
+        }
+        Insert: {
+          capex_rate: number
+          capex_unit: string
+          category: string
+          description: string
+          end_use?: string | null
+          id: string
+          install_weeks?: number
+          lifetime_years: number
+          maint_pct_capex?: number
+          name: string
+          savings_pct?: number
+        }
+        Update: {
+          capex_rate?: number
+          capex_unit?: string
+          category?: string
+          description?: string
+          end_use?: string | null
+          id?: string
+          install_weeks?: number
+          lifetime_years?: number
+          maint_pct_capex?: number
+          name?: string
+          savings_pct?: number
+        }
+        Relationships: []
+      }
       business_sites: {
         Row: {
           current_option_id: string | null

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+import { useMyHome } from "@/lib/my-home";
 import { PageHeader } from "@/components/energy/AppShell";
 import { ProductComparisonTable } from "@/components/energy/ProductComparisonTable";
 import { EnergyCostCard, LifetimeCostCard, PaybackCard, SavingsCard } from "@/components/energy/MetricCards";
@@ -98,6 +99,17 @@ function BuyPage() {
   const [tariffId, setTariffId] = useState<string>();
   const [ctx, setCtx] = useState<HouseholdContext>({ areaM2: 68, roomM2: 18, occupants: 3, acHoursPerDay: 8, evKmPerYear: 12000 });
 
+  const myHome = useMyHome();
+  useEffect(() => {
+    if (myHome.saved) setHomeId("my-home");
+  }, [myHome.saved]);
+  useEffect(() => {
+    if (homeId === "my-home" && myHome.saved) {
+      const p = myHome.home.profile;
+      setCtx((c) => ({ ...c, areaM2: p.areaM2, occupants: p.occupants, acHoursPerDay: p.acHoursPerDay }));
+      setTariffId(p.tariffId);
+    }
+  }, [homeId, myHome.saved, myHome.home.profile]);
   const home = homes.data?.find((h) => h.id === homeId);
   useEffect(() => {
     if (home) {
@@ -137,7 +149,10 @@ function BuyPage() {
           <Label className="text-xs text-muted-foreground">Energy Passport</Label>
           <Select value={homeId} onValueChange={setHomeId}>
             <SelectTrigger className="mt-1 h-9"><SelectValue /></SelectTrigger>
-            <SelectContent>{homes.data?.map((h) => <SelectItem key={h.id} value={h.id}>{h.name}</SelectItem>)}</SelectContent>
+            <SelectContent>
+              {myHome.saved && <SelectItem value="my-home">My home ({myHome.home.profile.name})</SelectItem>}
+              {homes.data?.map((h) => <SelectItem key={h.id} value={h.id}>{h.name}</SelectItem>)}
+            </SelectContent>
           </Select>
         </div>
         <div>
@@ -203,7 +218,7 @@ function BuyPage() {
             metrics={{
               category,
               tariff: tariff.name,
-              household: { passport: home?.name, ...ctx, peer_median_kwh: home ? Number(home.peer_median_kwh) : null },
+              household: { passport: homeId === "my-home" ? myHome.home.profile.name : home?.name, ...ctx, peer_median_kwh: home ? Number(home.peer_median_kwh) : null },
               horizon_years: H,
               best_choice: best.product.id,
               candidate: { ...cand.product, size_fit: cand.fit, required_capacity: cand.required, usage_factor: cand.usageFactor, annual_kwh_in_home: cand.annualKwh, annual_cost: cand.annualCost, lifetime_cost_pv: cand.lifetimeCost, horizon_tco_pv: cand.horizonTco, lifetime_co2_kg: cand.lifetimeCo2Kg, shift_saving: cand.annualShiftSaving },

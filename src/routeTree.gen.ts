@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BuildingsRouteImport } from './routes/buildings'
 import { Route as BuyRouteImport } from './routes/buy'
+import { Route as HomeRouteImport } from './routes/home'
 import { Route as PassportRouteImport } from './routes/passport'
 import { Route as ProcurementRouteImport } from './routes/procurement'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
@@ -20,9 +22,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BuildingsRoute = BuildingsRouteImport.update({
+  id: '/buildings',
+  path: '/buildings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BuyRoute = BuyRouteImport.update({
   id: '/buy',
   path: '/buy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PassportRoute = PassportRouteImport.update({
@@ -43,14 +55,18 @@ const ScenariosRoute = ScenariosRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/buildings': typeof BuildingsRoute
   '/buy': typeof BuyRoute
+  '/home': typeof HomeRoute
   '/passport': typeof PassportRoute
   '/procurement': typeof ProcurementRoute
   '/scenarios': typeof ScenariosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/buildings': typeof BuildingsRoute
   '/buy': typeof BuyRoute
+  '/home': typeof HomeRoute
   '/passport': typeof PassportRoute
   '/procurement': typeof ProcurementRoute
   '/scenarios': typeof ScenariosRoute
@@ -58,22 +74,48 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/buildings': typeof BuildingsRoute
   '/buy': typeof BuyRoute
+  '/home': typeof HomeRoute
   '/passport': typeof PassportRoute
   '/procurement': typeof ProcurementRoute
   '/scenarios': typeof ScenariosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/buy' | '/passport' | '/procurement' | '/scenarios'
+  fullPaths:
+    | '/'
+    | '/buildings'
+    | '/buy'
+    | '/home'
+    | '/passport'
+    | '/procurement'
+    | '/scenarios'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/buy' | '/passport' | '/procurement' | '/scenarios'
-  id: '__root__' | '/' | '/buy' | '/passport' | '/procurement' | '/scenarios'
+  to:
+    | '/'
+    | '/buildings'
+    | '/buy'
+    | '/home'
+    | '/passport'
+    | '/procurement'
+    | '/scenarios'
+  id:
+    | '__root__'
+    | '/'
+    | '/buildings'
+    | '/buy'
+    | '/home'
+    | '/passport'
+    | '/procurement'
+    | '/scenarios'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BuildingsRoute: typeof BuildingsRoute
   BuyRoute: typeof BuyRoute
+  HomeRoute: typeof HomeRoute
   PassportRoute: typeof PassportRoute
   ProcurementRoute: typeof ProcurementRoute
   ScenariosRoute: typeof ScenariosRoute
@@ -88,11 +130,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/buildings': {
+      id: '/buildings'
+      path: '/buildings'
+      fullPath: '/buildings'
+      preLoaderRoute: typeof BuildingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/buy': {
       id: '/buy'
       path: '/buy'
       fullPath: '/buy'
       preLoaderRoute: typeof BuyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/passport': {
@@ -121,7 +177,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BuildingsRoute: BuildingsRoute,
   BuyRoute: BuyRoute,
+  HomeRoute: HomeRoute,
   PassportRoute: PassportRoute,
   ProcurementRoute: ProcurementRoute,
   ScenariosRoute: ScenariosRoute,

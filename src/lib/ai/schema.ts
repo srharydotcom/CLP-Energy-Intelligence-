@@ -21,5 +21,5 @@ export const analysisSchema = z.object({
 export type AIFinding = z.infer<typeof findingSchema>;
 export type AIAnalysis = z.infer<typeof analysisSchema>;
 
-export const MODULES = ["passport", "purchase", "procurement", "scenario"] as const;
+export const MODULES = ["passport", "purchase", "procurement", "scenario", "home", "building"] as const;
 export type AnalysisModule = (typeof MODULES)[number];

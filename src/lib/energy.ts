@@ -264,3 +264,44 @@ export function breakEvenYear(c: ContextEconomics, b: ContextEconomics): number 
   }
   return null;
 }
+
+// ---------- Appliance inventory ----------
+export type CatalogAppliance = T["appliance_catalog"]["Row"];
+
+export interface OwnedAppliance {
+  uid: string;
+  catalogId: string | null; // null = miscellaneous / user-defined
+  name: string;
+  category: string;
+  endUse: string;
+  watts: number;
+  standbyWatts: number;
+  hoursPerDay: number;
+  daysPerYear: number;
+  quantity: number;
+}
+
+export function applianceAnnualKwh(x: OwnedAppliance) {
+  const activeH = x.hoursPerDay * x.daysPerYear;
+  const standbyH = Math.max(0, 8760 - activeH);
+  return (x.quantity * (x.watts * activeH + x.standbyWatts * standbyH)) / 1000;
+}
+
+export function inventorySummary(items: OwnedAppliance[], t: Tariff, a: Assumptions) {
+  const rows = items.map((x) => {
+    const kwh = applianceAnnualKwh(x) * (1 + a.usageChangePct / 100);
+    return { item: x, kwh, cost: annualEnergyCost(applianceAnnualKwh(x), t, a), standbyKwh: (x.quantity * x.standbyWatts * Math.max(0, 8760 - x.hoursPerDay * x.daysPerYear)) / 1000 };
+  });
+  const totalKwh = rows.reduce((s, r) => s + r.kwh, 0);
+  const totalCost = rows.reduce((s, r) => s + r.cost, 0);
+  const byEndUse: Record<string, number> = {};
+  for (const r of rows) byEndUse[r.item.endUse] = (byEndUse[r.item.endUse] ?? 0) + r.kwh;
+  return {
+    rows: rows.sort((p, q) => q.kwh - p.kwh),
+    totalKwh,
+    totalCost,
+    standbyKwh: rows.reduce((s, r) => s + r.standbyKwh, 0),
+    byEndUse,
+    co2Tonnes: (totalKwh * Number(t.carbon_kg_per_kwh)) / 1000,
+  };
+}
