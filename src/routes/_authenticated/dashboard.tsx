@@ -1,14 +1,26 @@
+import { useAreaUnit } from "@/lib/units";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useAreaUnit } from "@/lib/units";
 import { useQuery } from "@tanstack/react-query";
+import { useAreaUnit } from "@/lib/units";
 import { useState } from "react";
+import { useAreaUnit } from "@/lib/units";
 import { ArrowRight, IdCard, ShoppingCart, Building2, GitBranch, Plus, Trash2, House } from "lucide-react";
+import { useAreaUnit } from "@/lib/units";
 import { PageHeader } from "@/components/energy/AppShell";
+import { useAreaUnit } from "@/lib/units";
 import { Button } from "@/components/ui/button";
+import { useAreaUnit } from "@/lib/units";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAreaUnit } from "@/lib/units";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useAreaUnit } from "@/lib/units";
 import { homesQuery, optionsQuery, sitesQuery, tariffsQuery, productsQuery } from "@/lib/queries";
+import { useAreaUnit } from "@/lib/units";
 import { DEFAULT_ASSUMPTIONS, asArray, hkd, inventoryPassport, num, passportMetrics, procurementResult } from "@/lib/energy";
+import { useAreaUnit } from "@/lib/units";
 import { useHomes, type SavedHome } from "@/lib/my-home";
+import { useAreaUnit } from "@/lib/units";
 import { useProfile } from "@/lib/profile";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -32,6 +44,7 @@ function Dashboard() {
 }
 
 function HouseholdDashboard({ name }: { name: string | null }) {
+  const u = useAreaUnit();
   const { homes, isLoading, create, remove, setActiveId } = useHomes();
   const tariffs = useQuery(tariffsQuery);
   const [toDelete, setToDelete] = useState<SavedHome | null>(null);
@@ -62,7 +75,7 @@ function HouseholdDashboard({ name }: { name: string | null }) {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="truncate font-display text-lg font-semibold">{h.profile.name}</div>
-                  <div className="text-xs text-muted-foreground">{h.profile.district || "Hong Kong"} · {num(h.profile.areaM2)} m² · {h.profile.occupants} people</div>
+                  <div className="text-xs text-muted-foreground">{h.profile.district || "Hong Kong"} · {u.show(h.profile.areaM2)} {u.label} · {h.profile.occupants} people</div>
                 </div>
                 {r ? <span className={`grid size-9 shrink-0 place-items-center rounded font-mono font-bold text-background ${GRADE_BG[r.grade]}`}>{r.grade}</span>
                   : <span className="grid size-9 shrink-0 place-items-center rounded border border-dashed text-muted-foreground"><House className="size-4" /></span>}

@@ -1,19 +1,36 @@
+import { useAreaUnit } from "@/lib/units";
 import { createFileRoute } from "@tanstack/react-router";
+import { useAreaUnit } from "@/lib/units";
 import { useQuery } from "@tanstack/react-query";
+import { useAreaUnit } from "@/lib/units";
 import { useMemo, useState } from "react";
+import { useAreaUnit } from "@/lib/units";
 import { Plus, Trash2, CheckCircle2, XCircle } from "lucide-react";
+import { useAreaUnit } from "@/lib/units";
 import { PageHeader } from "@/components/energy/AppShell";
+import { useAreaUnit } from "@/lib/units";
 import { AssumptionPanel } from "@/components/energy/AssumptionPanel";
+import { useAreaUnit } from "@/lib/units";
 import { AIAnalysisPanel } from "@/components/energy/AIFindingCard";
+import { useAreaUnit } from "@/lib/units";
 import { Button } from "@/components/ui/button";
+import { useAreaUnit } from "@/lib/units";
 import { Input } from "@/components/ui/input";
+import { useAreaUnit } from "@/lib/units";
 import { Label } from "@/components/ui/label";
+import { useAreaUnit } from "@/lib/units";
 import { Switch } from "@/components/ui/switch";
+import { useAreaUnit } from "@/lib/units";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAreaUnit } from "@/lib/units";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAreaUnit } from "@/lib/units";
 import { cn } from "@/lib/utils";
+import { useAreaUnit } from "@/lib/units";
 import { archetypesQuery, measuresQuery } from "@/lib/queries";
+import { useAreaUnit } from "@/lib/units";
 import { DEFAULT_ASSUMPTIONS, hkd, num } from "@/lib/energy";
+import { useAreaUnit } from "@/lib/units";
 import { WEATHER, defaultInputs, evaluateMeasures, sensitivity, type BuildingInputs, type Weather } from "@/lib/buildings";
 
 export const Route = createFileRoute("/_authenticated/buildings")({
@@ -51,6 +68,8 @@ const EMPTY_BASICS: Record<BasicKey, number | null> = { areaM2: null, hoursPerDa
 const req = (fn: (n: number) => void) => (n: number | null) => fn(n ?? 0);
 
 function BuildingsPage() {
+  const u = useAreaUnit();
+  const isArea = (k: BasicKey) => k === "areaM2";
   const archetypes = useQuery(archetypesQuery);
   const measures = useQuery(measuresQuery);
   const [archId, setArchIdRaw] = useState("");
@@ -87,7 +106,7 @@ function BuildingsPage() {
   if (!x || !res || !sens) {
     const area = basics.areaM2 ?? Number(arch.default_area_m2);
     const typical: Record<BasicKey, string> = {
-      areaM2: num(Number(arch.default_area_m2)), hoursPerDay: num(Number(arch.hours_per_day)), daysPerWeek: num(Number(arch.days_per_week)),
+      areaM2: num(u.show(Number(arch.default_area_m2))), hoursPerDay: num(Number(arch.hours_per_day)), daysPerWeek: num(Number(arch.days_per_week)),
       occupancy: num(Math.round((Number(arch.occupancy_per_1000m2) * area) / 1000)), rate: "1.10", budget: "—",
     };
     return (
@@ -100,7 +119,7 @@ function BuildingsPage() {
           <p className="mb-4 text-sm text-muted-foreground">Enter your own figures. Grey hints show what is typical for this type of building.</p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {BASICS.map((f) => (
-              <F key={f.key} label={f.label} suffix={f.suffix} step={f.step} placeholder={`typical ${typical[f.key]}`} value={basics[f.key]} onChange={(n) => setBasics({ ...basics, [f.key]: n })} />
+              <F key={f.key} label={f.label} suffix={isArea(f.key) ? u.label : f.suffix} step={f.step} placeholder={`typical ${typical[f.key]}`} value={isArea(f.key) && basics[f.key] != null ? u.show(basics[f.key]!) : basics[f.key]} onChange={(n) => setBasics({ ...basics, [f.key]: isArea(f.key) && n != null ? u.toM2(n) : n })} />
             ))}
           </div>
           <Button className="mt-5" disabled={!basicsReady} onClick={start}>Evaluate investments</Button>
@@ -133,7 +152,7 @@ function BuildingsPage() {
         <section className="rounded-lg border bg-card p-4">
           <h2 className="mb-3 font-display text-base font-semibold">Building</h2>
           <div className="grid grid-cols-2 gap-3">
-            <F label="Floor area" suffix="m²" step={500} value={x.areaM2} onChange={req((n) => set({ areaM2: n }))} />
+            <F label="Floor area" suffix={u.label} step={500} value={u.show(x.areaM2)} onChange={req((n) => set({ areaM2: u.toM2(n) }))} />
             <F label="Annual use" suffix="kWh" step={10000} placeholder={`est. ${num(b.kwh)}`} value={x.annualKwhOverride} onChange={(n) => set({ annualKwhOverride: n || null })} />
             <F label="Operating hours/day" step={0.5} value={x.hoursPerDay} onChange={req((n) => set({ hoursPerDay: Math.min(24, n) }))} />
             <F label="Days/week" value={x.daysPerWeek} onChange={req((n) => set({ daysPerWeek: Math.min(7, n) }))} />
@@ -162,7 +181,7 @@ function BuildingsPage() {
             <F label="Capital budget" suffix="HK$" step={500000} value={x.budget} onChange={req((n) => set({ budget: n }))} />
             <F label="Max payback" suffix="years" step={0.5} value={x.maxPaybackYears} onChange={req((n) => set({ maxPaybackYears: n }))} />
             <F label="Max install disruption" suffix="weeks" value={x.maxInstallWeeks} onChange={req((n) => set({ maxInstallWeeks: n }))} />
-            <F label="Usable roof" suffix="m²" step={100} value={x.roofAreaM2} onChange={req((n) => set({ roofAreaM2: n }))} />
+            <F label="Usable roof" suffix={u.label} step={100} value={u.show(x.roofAreaM2)} onChange={req((n) => set({ roofAreaM2: u.toM2(n) }))} />
           </div>
         </section>
       </div>
@@ -171,7 +190,7 @@ function BuildingsPage() {
         <h2 className="mb-1 font-display text-base font-semibold">Baseline</h2>
         <div className="grid gap-4 font-mono text-sm sm:grid-cols-4">
           <div><div className="text-[11px] uppercase text-muted-foreground">Annual use</div>{num(b.kwh)} kWh</div>
-          <div><div className="text-[11px] uppercase text-muted-foreground">Intensity</div>{num(b.intensity)} kWh/m²</div>
+          <div><div className="text-[11px] uppercase text-muted-foreground">Intensity</div>{num(u.perArea(b.intensity), u.unit === "sqft" ? 1 : 0)} kWh/{u.label}</div>
           <div><div className="text-[11px] uppercase text-muted-foreground">Peak demand</div>{num(b.peakKw)} kW</div>
           <div><div className="text-[11px] uppercase text-muted-foreground">Annual energy cost</div>{hkd(b.annualCost)}</div>
         </div>
