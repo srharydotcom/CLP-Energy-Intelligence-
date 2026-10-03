@@ -161,9 +161,30 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="rounded-lg border border-dashed p-10 text-center">
-      <p className="mb-4 text-muted-foreground">{text}</p>
-      <Button asChild><Link to="/home">Go to My Home</Link></Button>
+    <div className="passport-spread passport-empty">
+      <div className="passport-cover relative overflow-hidden">
+        <div className="passport-spine" aria-hidden="true" />
+        <div className="passport-cover-inner">
+          <div className="passport-cover-top font-mono text-[10px] uppercase text-primary"><span>CLP · Hong Kong</span><span>Residential / HK</span></div>
+          <div className="passport-cover-center">
+            <div className="passport-seal" aria-hidden="true"><span>CLP</span><span>ENERGY</span></div>
+            <div className="mt-6 font-mono text-[10px] uppercase text-primary">Household energy record</div>
+            <h2 className="mt-3 font-display text-4xl font-semibold leading-none sm:text-5xl">Energy<br />Passport</h2>
+            <div className="passport-cover-mark" aria-hidden="true">HK</div>
+          </div>
+          <div className="passport-cover-bottom font-mono text-[10px] uppercase text-primary"><span>Energy intelligence</span><span>01 / 06</span></div>
+        </div>
+      </div>
+      <div className="passport-sheet flex flex-col">
+        <div className="passport-sheet-masthead font-mono text-[10px] uppercase"><span>CLP / Energy Intelligence</span><span>HK · 02</span></div>
+        <div className="flex flex-1 flex-col items-start justify-center py-12">
+          <div className="font-mono text-[10px] uppercase text-muted-foreground">Awaiting household details</div>
+          <h3 className="mt-3 font-display text-2xl font-semibold">Your record starts here.</h3>
+          <p className="mt-3 max-w-sm text-sm text-muted-foreground">{text}</p>
+          <Button asChild className="mt-6"><Link to="/home">Go to My Home</Link></Button>
+        </div>
+        <div className="passport-sheet-footer font-mono text-[10px] uppercase"><span>Residential energy record</span><span>02 / 06</span></div>
+      </div>
     </div>
   );
 }
