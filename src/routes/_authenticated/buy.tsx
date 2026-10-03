@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { homeContext, useHomes } from "@/lib/my-home";
+import { homeContext, homeIsComplete, useHomes } from "@/lib/my-home";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { PageHeader } from "@/components/energy/AppShell";
 import { ProductComparisonTable } from "@/components/energy/ProductComparisonTable";
