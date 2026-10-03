@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/buildings")({
   component: BuildingsPage,
 });
 
-function F({ label, value, onChange, step = 1, suffix, placeholder }: { label: string; value: number | null; onChange: (n: number | null) => void; step?: number; suffix?: string; placeholder?: string }) {
+function F({ label, value, onChange, step = 1, suffix, placeholder }: { label: string; value: number | null; onChange: (n: number | null) => void; step?: number | undefined; suffix?: string | undefined; placeholder?: string }) {
   return (
     <div className="space-y-1">
       <Label className="text-xs text-muted-foreground">{label}{suffix && <span className="ml-1 font-mono">({suffix})</span>}</Label>
