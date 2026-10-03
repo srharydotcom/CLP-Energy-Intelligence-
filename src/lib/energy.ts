@@ -252,11 +252,12 @@ export function contextEconomics(p: Product, t: Tariff, a: Assumptions, ctx: Hou
 
 /** First year in which candidate's cumulative cost drops to or below baseline's; null if never in horizon. */
 export function breakEvenYear(c: ContextEconomics, b: ContextEconomics): number | null {
-  if (c.cumulative[0] <= b.cumulative[0]) return 0;
+  const gapAt = (y: number) => (c.cumulative[y] ?? 0) - (b.cumulative[y] ?? 0);
+  if (gapAt(0) <= 0) return 0;
   for (let y = 1; y < c.cumulative.length; y++) {
-    if (c.cumulative[y] <= b.cumulative[y]) {
-      const prevGap = c.cumulative[y - 1] - b.cumulative[y - 1];
-      const gap = c.cumulative[y] - b.cumulative[y];
+    if (gapAt(y) <= 0) {
+      const prevGap = gapAt(y - 1);
+      const gap = gapAt(y);
       return y - 1 + prevGap / (prevGap - gap);
     }
   }

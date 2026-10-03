@@ -54,7 +54,7 @@ function NumField({ label, value, onChange, step = 1, hint }: { label: string; v
 function AddProductDialog({ category, onAdd }: { category: string; onAdd: (p: Product) => void }) {
   const [open, setOpen] = useState(false);
   const [f, setF] = useState({ brand: "", model: "", price: 8000, annual_kwh: 800, lifetime_years: 10, maintenance_per_year: 200, capacity: 3.5, shift_kwh: 0 });
-  const meta = USAGE_BASIS[category];
+  const meta = USAGE_BASIS[category] ?? USAGE_BASIS["Air conditioner"]!;
   const set = (k: keyof typeof f) => (v: number | string) => setF({ ...f, [k]: v });
   const submit = () => {
     onAdd({
