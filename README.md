@@ -4,6 +4,8 @@
 
 > *"How might AI help CLP become a trusted energy and lifestyle partner for future households and businesses?"*
 
+**[Try the live app →](https://id-preview--4ff9fcc5-db06-43ea-a476-1f8361a633ec.lovable.app)**
+
 ---
 
 ## Why we built this
@@ -49,6 +51,10 @@ This is a **decision platform, not a chatbot**:
 
 ## Running it locally
 
+Anyone can run this repo — it's a standard web project.
+
+**You'll need:** [Node.js](https://nodejs.org) (v20 or newer). Then:
+
 ```sh
 git clone <this-repository-url>
 cd <repository-name>
@@ -56,7 +62,15 @@ npm i
 npm run dev
 ```
 
-The app ships with demo reference data (tariffs, a product catalogue, benchmark homes and business sites). Create an account and everything you save — homes, appliances, analyses — is persisted to your profile.
+Open the address it prints (usually `http://localhost:8080`).
+
+### What to expect
+
+- **Sign in with email** — it's the most reliable way in when running locally (Google sign-in is set up for the hosted domain, so it may not complete on localhost). You can also just use the **live app** link above, which needs nothing installed.
+- **The backend is hosted, not local.** The database, accounts and AI features live in the project's cloud backend, so a locally-run copy connects to the same live services — same demo data, same sign-ins. Your account and saved homes work the same either way.
+- **Start from a blank slate.** The app never shows recommendations until you've entered your own details: add a home, add its appliances, and the Energy Passport fills in. Everything you save persists to your account.
+- **Demo reference data is built in** — tariffs, a real Hong Kong product catalogue, benchmark homes and business sites — so the comparisons work from day one.
+- **Other useful commands:** `npm run test` runs the test suite, `npm run build` produces a production build, `npm run lint` checks code style.
 
 ## Design principles
 
