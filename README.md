@@ -1,5 +1,4 @@
-# Remix of CLP Energy Insights
-
+CLP Energy Intelligence 
 Build a production quality React + TypeScript energy intelligence dashboard called “CLP Energy Intelligence”.
 
 Core modules:
